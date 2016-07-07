@@ -55,7 +55,7 @@ namespace MZZ.DAL
 					new MySqlParameter("@prizes_main_img", MySqlDbType.VarChar,50),
 					new MySqlParameter("@prizes_angle", MySqlDbType.VarChar,50),
 					new MySqlParameter("@prizes_probability", MySqlDbType.VarChar,50),
-					new MySqlParameter("@prizes_remark", MySqlDbType.Text),
+					new MySqlParameter("@prizes_remark", MySqlDbType.VarChar,255),
 					new MySqlParameter("@prizes_create_time", MySqlDbType.DateTime),
 					new MySqlParameter("@prizes_status", MySqlDbType.Int32,11)};
 			parameters[0].Value = model.prizes_prize_name;
@@ -99,7 +99,7 @@ namespace MZZ.DAL
 					new MySqlParameter("@prizes_main_img", MySqlDbType.VarChar,50),
 					new MySqlParameter("@prizes_angle", MySqlDbType.VarChar,50),
 					new MySqlParameter("@prizes_probability", MySqlDbType.VarChar,50),
-					new MySqlParameter("@prizes_remark", MySqlDbType.Text),
+					new MySqlParameter("@prizes_remark", MySqlDbType.VarChar,255),
 					new MySqlParameter("@prizes_create_time", MySqlDbType.DateTime),
 					new MySqlParameter("@prizes_status", MySqlDbType.Int32,11),
 					new MySqlParameter("@prizes_id", MySqlDbType.Int32,11)};

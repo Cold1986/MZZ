@@ -11,14 +11,14 @@ namespace MZZ.Model
 		{}
 		#region Model
 		private int _code_id;
-        private string _code_code = "";
+		private string _code_code;
 		private int _code_userid=0;
-        private string _code_openid = "";
+		private string _code_openid;
 		private int _code_prizeid=0;
-        private string _code_prize_name = "";
-        private string _code_main_img = "";
-        private string _code_remark = "";
-        private DateTime _code_create_time = DateTime.Now;
+		private string _code_prize_name;
+		private string _code_main_img;
+		private string _code_remark;
+		private DateTime _code_create_time;
 		private int _code_status=0;
 		/// <summary>
 		/// auto_increment
@@ -44,14 +44,14 @@ namespace MZZ.Model
 			set{ _code_userid=value;}
 			get{return _code_userid;}
 		}
-        /// <summary>
-        /// 
-        /// </summary>
-        public string code_openid
-        {
-            set { _code_openid = value; }
-            get { return _code_openid; }
-        }
+		/// <summary>
+		/// 
+		/// </summary>
+		public string code_openid
+		{
+			set{ _code_openid=value;}
+			get{return _code_openid;}
+		}
 		/// <summary>
 		/// 
 		/// </summary>

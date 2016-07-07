@@ -50,7 +50,7 @@ namespace MZZ.DAL
 			strSql.Append(" values (");
 			strSql.Append("@user_phone,@user_pass,@user_integral,@user_level,@user_data,@user_login_time,@user_login_ip,@user_create_time,@user_create_ip,@user_openid,@user_nick_name,@user_sex,@user_city,@user_country,@user_province,@user_language,@user_head_img_url,@user_sub_time,@user_sub_scribe,@user_up_openid,@user_uopenid_time,@user_status,@user_hy_status,@user_qr_code)");
 			MySqlParameter[] parameters = {
-					new MySqlParameter("@user_phone", MySqlDbType.VarChar,11),
+					new MySqlParameter("@user_phone", MySqlDbType.VarChar,50),
 					new MySqlParameter("@user_pass", MySqlDbType.VarChar,32),
 					new MySqlParameter("@user_integral", MySqlDbType.Int32,10),
 					new MySqlParameter("@user_level", MySqlDbType.Int32,3),
@@ -62,11 +62,11 @@ namespace MZZ.DAL
 					new MySqlParameter("@user_openid", MySqlDbType.VarChar,50),
 					new MySqlParameter("@user_nick_name", MySqlDbType.VarChar,50),
 					new MySqlParameter("@user_sex", MySqlDbType.Int32,11),
-					new MySqlParameter("@user_city", MySqlDbType.VarChar,20),
-					new MySqlParameter("@user_country", MySqlDbType.VarChar,20),
-					new MySqlParameter("@user_province", MySqlDbType.VarChar,20),
-					new MySqlParameter("@user_language", MySqlDbType.VarChar,20),
-					new MySqlParameter("@user_head_img_url", MySqlDbType.VarChar,20),
+					new MySqlParameter("@user_city", MySqlDbType.VarChar,50),
+					new MySqlParameter("@user_country", MySqlDbType.VarChar,50),
+					new MySqlParameter("@user_province", MySqlDbType.VarChar,50),
+					new MySqlParameter("@user_language", MySqlDbType.VarChar,50),
+					new MySqlParameter("@user_head_img_url", MySqlDbType.VarChar,255),
 					new MySqlParameter("@user_sub_time", MySqlDbType.DateTime),
 					new MySqlParameter("@user_sub_scribe", MySqlDbType.Bit),
 					new MySqlParameter("@user_up_openid", MySqlDbType.VarChar,50),
@@ -142,7 +142,7 @@ namespace MZZ.DAL
 			strSql.Append("user_qr_code=@user_qr_code");
 			strSql.Append(" where user_id=@user_id");
 			MySqlParameter[] parameters = {
-					new MySqlParameter("@user_phone", MySqlDbType.VarChar,11),
+					new MySqlParameter("@user_phone", MySqlDbType.VarChar,50),
 					new MySqlParameter("@user_pass", MySqlDbType.VarChar,32),
 					new MySqlParameter("@user_integral", MySqlDbType.Int32,10),
 					new MySqlParameter("@user_level", MySqlDbType.Int32,3),
@@ -154,11 +154,11 @@ namespace MZZ.DAL
 					new MySqlParameter("@user_openid", MySqlDbType.VarChar,50),
 					new MySqlParameter("@user_nick_name", MySqlDbType.VarChar,50),
 					new MySqlParameter("@user_sex", MySqlDbType.Int32,11),
-					new MySqlParameter("@user_city", MySqlDbType.VarChar,20),
-					new MySqlParameter("@user_country", MySqlDbType.VarChar,20),
-					new MySqlParameter("@user_province", MySqlDbType.VarChar,20),
-					new MySqlParameter("@user_language", MySqlDbType.VarChar,20),
-					new MySqlParameter("@user_head_img_url", MySqlDbType.VarChar,20),
+					new MySqlParameter("@user_city", MySqlDbType.VarChar,50),
+					new MySqlParameter("@user_country", MySqlDbType.VarChar,50),
+					new MySqlParameter("@user_province", MySqlDbType.VarChar,50),
+					new MySqlParameter("@user_language", MySqlDbType.VarChar,50),
+					new MySqlParameter("@user_head_img_url", MySqlDbType.VarChar,255),
 					new MySqlParameter("@user_sub_time", MySqlDbType.DateTime),
 					new MySqlParameter("@user_sub_scribe", MySqlDbType.Bit),
 					new MySqlParameter("@user_up_openid", MySqlDbType.VarChar,50),

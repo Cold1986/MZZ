@@ -6,12 +6,12 @@ using MZZ.Model;
 namespace MZZ.BLL
 {
 	/// <summary>
-	/// tb_code
+	/// tb_behavior
 	/// </summary>
-	public partial class tb_code
+	public partial class tb_behavior
 	{
-		private readonly MZZ.DAL.tb_code dal=new MZZ.DAL.tb_code();
-		public tb_code()
+		private readonly MZZ.DAL.tb_behavior dal=new MZZ.DAL.tb_behavior();
+		public tb_behavior()
 		{}
 		#region  BasicMethod
 
@@ -26,15 +26,15 @@ namespace MZZ.BLL
 		/// <summary>
 		/// 是否存在该记录
 		/// </summary>
-		public bool Exists(int code_id)
+		public bool Exists(int behavior_id)
 		{
-			return dal.Exists(code_id);
+			return dal.Exists(behavior_id);
 		}
 
 		/// <summary>
 		/// 增加一条数据
 		/// </summary>
-		public bool Add(MZZ.Model.tb_code model)
+		public bool Add(MZZ.Model.tb_behavior model)
 		{
 			return dal.Add(model);
 		}
@@ -42,7 +42,7 @@ namespace MZZ.BLL
 		/// <summary>
 		/// 更新一条数据
 		/// </summary>
-		public bool Update(MZZ.Model.tb_code model)
+		public bool Update(MZZ.Model.tb_behavior model)
 		{
 			return dal.Update(model);
 		}
@@ -50,41 +50,41 @@ namespace MZZ.BLL
 		/// <summary>
 		/// 删除一条数据
 		/// </summary>
-		public bool Delete(int code_id)
+		public bool Delete(int behavior_id)
 		{
 			
-			return dal.Delete(code_id);
+			return dal.Delete(behavior_id);
 		}
 		/// <summary>
 		/// 删除一条数据
 		/// </summary>
-		public bool DeleteList(string code_idlist )
+		public bool DeleteList(string behavior_idlist )
 		{
-			return dal.DeleteList(code_idlist );
+			return dal.DeleteList(behavior_idlist );
 		}
 
 		/// <summary>
 		/// 得到一个对象实体
 		/// </summary>
-		public MZZ.Model.tb_code GetModel(int code_id)
+		public MZZ.Model.tb_behavior GetModel(int behavior_id)
 		{
 			
-			return dal.GetModel(code_id);
+			return dal.GetModel(behavior_id);
 		}
 
 		/// <summary>
 		/// 得到一个对象实体，从缓存中
 		/// </summary>
-		public MZZ.Model.tb_code GetModelByCache(int code_id)
+		public MZZ.Model.tb_behavior GetModelByCache(int behavior_id)
 		{
 			
-			string CacheKey = "tb_codeModel-" + code_id;
+			string CacheKey = "tb_behaviorModel-" + behavior_id;
 			object objModel = Maticsoft.Common.DataCache.GetCache(CacheKey);
 			if (objModel == null)
 			{
 				try
 				{
-					objModel = dal.GetModel(code_id);
+					objModel = dal.GetModel(behavior_id);
 					if (objModel != null)
 					{
 						int ModelCache = Maticsoft.Common.ConfigHelper.GetConfigInt("ModelCache");
@@ -93,7 +93,7 @@ namespace MZZ.BLL
 				}
 				catch{}
 			}
-			return (MZZ.Model.tb_code)objModel;
+			return (MZZ.Model.tb_behavior)objModel;
 		}
 
 		/// <summary>
@@ -106,7 +106,7 @@ namespace MZZ.BLL
 		/// <summary>
 		/// 获得数据列表
 		/// </summary>
-		public List<MZZ.Model.tb_code> GetModelList(string strWhere)
+		public List<MZZ.Model.tb_behavior> GetModelList(string strWhere)
 		{
 			DataSet ds = dal.GetList(strWhere);
 			return DataTableToList(ds.Tables[0]);
@@ -114,13 +114,13 @@ namespace MZZ.BLL
 		/// <summary>
 		/// 获得数据列表
 		/// </summary>
-		public List<MZZ.Model.tb_code> DataTableToList(DataTable dt)
+		public List<MZZ.Model.tb_behavior> DataTableToList(DataTable dt)
 		{
-			List<MZZ.Model.tb_code> modelList = new List<MZZ.Model.tb_code>();
+			List<MZZ.Model.tb_behavior> modelList = new List<MZZ.Model.tb_behavior>();
 			int rowsCount = dt.Rows.Count;
 			if (rowsCount > 0)
 			{
-				MZZ.Model.tb_code model;
+				MZZ.Model.tb_behavior model;
 				for (int n = 0; n < rowsCount; n++)
 				{
 					model = dal.DataRowToModel(dt.Rows[n]);

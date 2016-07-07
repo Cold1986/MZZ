@@ -12,12 +12,12 @@ namespace MZZ.Model
 		#region Model
 		private int _activity_id;
 		private int _activity_hyid=0;
-        private string _activity_openid = "";
-        private string _activity_reason = "";
+		private string _activity_openid;
+		private string _activity_reason;
 		private int _activity_num=0;
 		private int _activity_calculate=0;
 		private int _activity_state=0;
-        private DateTime _activity_times = DateTime.Now;
+		private DateTime _activity_times;
 		/// <summary>
 		/// auto_increment
 		/// </summary>

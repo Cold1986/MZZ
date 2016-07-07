@@ -11,14 +11,14 @@ namespace MZZ.Model
 		{}
 		#region Model
 		private int _prizes_id;
-        private string _prizes_prize_name = "";
-        private int _prizes_quantity = 0;
-        private string _prizes_main_img = "";
-        private string _prizes_angle = "";
-        private string _prizes_probability = "";
-        private string _prizes_remark = "";
-        private DateTime _prizes_create_time = DateTime.Now;
-        private int _prizes_status = 0;
+		private string _prizes_prize_name;
+		private int _prizes_quantity;
+		private string _prizes_main_img;
+		private string _prizes_angle;
+		private string _prizes_probability;
+		private string _prizes_remark;
+		private DateTime _prizes_create_time;
+		private int _prizes_status;
 		/// <summary>
 		/// auto_increment
 		/// </summary>

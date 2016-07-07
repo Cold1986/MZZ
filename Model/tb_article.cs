@@ -11,12 +11,12 @@ namespace MZZ.Model
 		{}
 		#region Model
 		private int _article_id;
-        private int _article_type = 0;
-        private string _article_content = "";
-        private string _article_imgs = "";
+		private int _article_type;
+		private string _article_content;
+		private string _article_imgs;
 		private int _article_barrage=1;
-        private int _article_user_id = 0;
-        private int _article_time = 0;
+		private int _article_user_id;
+		private int _article_time;
 		private int _article_statu=1;
 		/// <summary>
 		/// auto_increment

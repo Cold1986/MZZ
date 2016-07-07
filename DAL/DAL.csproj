@@ -137,12 +137,19 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SysManage.cs" />
     <Compile Include="tb_activity.cs" />
     <Compile Include="tb_article.cs" />
+    <Compile Include="tb_behavior.cs" />
     <Compile Include="tb_code.cs" />
+    <Compile Include="tb_figure.cs" />
     <Compile Include="tb_imgs.cs" />
+    <Compile Include="tb_lntegral_prize.cs" />
+    <Compile Include="tb_lntegral_users.cs" />
     <Compile Include="tb_log.cs" />
+    <Compile Include="tb_news.cs" />
     <Compile Include="tb_prizes.cs" />
+    <Compile Include="tb_signin.cs" />
     <Compile Include="tb_user.cs" />
   </ItemGroup>
   <ItemGroup>
