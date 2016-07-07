@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class newadmin_user_edit : System.Web.UI.Page
+{
+    MZZ.BLL.tb_user blluser = new MZZ.BLL.tb_user();
+    MZZ.Model.tb_user muser = new MZZ.Model.tb_user();
+
+    public string UserId, OpenId, NickName, Sex, HeadImgUrl, SubScribe, UOpenId, Status, hyStatus, qr_Code, id, Phone;
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        SessionHelper.UserInfo userinfo = SessionHelper.CheckLogin();
+        if (userinfo == null || userinfo.TableName != SessionHelper.LoginType.Admin)
+        {
+            Response.Redirect("default.aspx");
+            return;
+        }
+
+         id = Request.QueryString["id"];
+
+        if (!String.IsNullOrEmpty(id))
+        {
+            int iid = WebHelp.ConvertStringToInt(id);
+            if (iid == -1)
+            {
+                Response.Write("<script>alert('Id错误！');location.href='index.aspx';</script>");
+                return;
+            }
+
+            if (!IsPostBack)
+            {
+                var dt = blluser.GetModel(iid);
+
+                if (dt!=null)
+                {
+                    //获取订单信息
+                    OpenId = dt.OpenId;
+                    NickName = dt.NickName;
+                    SubScribe = dt.SubScribe.ToString();
+                    HeadImgUrl = dt.HeadImgUrl;
+                    Phone = dt.Phone;
+                }
+            }
+        }
+        
+    }
+}

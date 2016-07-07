@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+public partial class receive : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        SessionHelper.UserInfo userinfo = SessionHelper.CheckLogin();
+        if (userinfo == null || userinfo.TableName != SessionHelper.LoginType.User)
+        {
+            CHelper.WriteLog("页面跳转", "Oauth.aspx?url=" + Server.UrlEncode(Request.Url.ToString()));
+            Response.Redirect("Oauth.aspx?url=" + Server.UrlEncode(Request.Url.ToString()));
+            return;
+        }
+        MZZ.Model.tb_user userModel = userinfo.Entity as MZZ.Model.tb_user;
+        string openid = userModel.user_openid;
+        bool subscribe = userModel.user_sub_scribe;
+        if (subscribe != true)
+        {
+            WebMessageBox.AdminShow("请先关注", "http://viewer.maka.im/pcviewer/RJ3BUAEG?DSCKID=55f2c955-5bc4-4dfb-8353-78651258cfe7&DSTIMESTAMP=1465131817117");
+        }
+        else
+        {
+            MZZ.BLL.tb_activity activityBLL = new MZZ.BLL.tb_activity();
+            var list = activityBLL.GetModelList("activity_reason='首次关注奖励' and activity_openid='" + openid + "'");
+            if (list.Count == 0)
+            {
+                MZZ.Model.tb_activity activityModel = new MZZ.Model.tb_activity();
+                activityModel.activity_hyid = 1;
+                activityModel.activity_openid = openid;
+                activityModel.activity_reason = WebHelp.GB2312ToUTF8("首次关注奖励");
+                activityModel.activity_num = 0;
+                activityModel.activity_calculate = 0;
+                activityModel.activity_state = 1;
+                activityModel.activity_times = Convert.ToDateTime(System.DateTime.Now);
+                activityBLL.Add(activityModel);
+                WebMessageBox.AdminShow("领取成功哦~快去领取可爱的挂件吧~", "Prize.aspx");
+            }
+            else
+            {
+                WebMessageBox.AdminShow("虽然你已经领取过啦~不过偷偷告诉你还可以去抽奖哦", "Luckdraw.aspx");
+            }
+        }
+    }
+}

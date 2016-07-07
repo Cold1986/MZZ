@@ -1,0 +1,114 @@
+body{ background:url(/images/fz_bg.jpg) repeat; }
+.wrapper1{ width:1200px; margin:0px auto; position:relative;  height:758px;}
+
+.fz_text{ background:url(/images/fz_text.jpg) no-repeat top center; margin:0px auto;  height:758px;  position:relative;}
+.fz_renwu{
+	position:absolute;
+	left: 560px;
+	top: 258px;
+	z-index:30;
+	background:url(../images/man1.png) no-repeat;
+}
+.rwms{
+	text-align:right;
+	font-size:20px;
+	position:absolute;
+	left: 444px;
+	top: 285px;
+	width: 123px;
+	z-index:30;
+}
+.rwms span{ font-size:28px; color:#d53131;}
+.zjxm {
+	text-align:center;
+	font-size:16px;
+	line-height:59px;
+	color:#fe7171;
+	position:absolute;
+	left: 113px;
+	top: 301px;
+	width: 110px;
+	height: 59px;
+}
+
+.bksz{
+	text-align:center;
+	color:#Fff;
+	position:absolute;
+	left: 622px;
+	top: 42px;
+	width: 111px;
+	height: 114px;
+}
+.qypt{
+	position:absolute;
+	left: 865px;
+	top: 158px;
+	width: 226px;
+	height: 197px;
+}
+.qypt div{ padding-bottom:15px;}
+.qy1{ padding-left: 30px;}
+.qy2{ }
+.qy3{ padding-left: 30px;}
+.qwms{
+	position:absolute;
+	left: 864px;
+	top: 546px;
+	width: 169px;
+	height: 103px;
+	color:#fff;
+}
+
+.detail{
+	position:absolute;
+	left: 102px;
+	top: 461px;
+	width: 346px;
+	height: 241px;
+	color:#333;
+}
+.l_box h1 span.typ1{ background:#ffb849;}
+.l_box h1 span.typ2{ background:#6bb46b;}
+.l_box h1 span.typ3{ background:#f9446b;}
+.l_box{ padding-bottom:10px; color:#111;}
+.l_box h1{ font-weight:700;}
+.l_box h1 span{ display:inline-block; margin-right:5px; width:60px; padding-left:10px; }
+
+
+.qyjt{
+	text-align:center;
+	position:absolute;
+	left: 292px;
+	top: 229px;
+	width: 180px;
+	height: 49px;
+	z-index:20;
+}
+.wzdt{
+	background:url(/images/dtb.png) no-repeat;
+	height:71px;
+	width:248px;
+	z-index:10;
+	position:absolute;
+	left:266px;
+	top:226px;
+}
+.wzdd{
+	position:absolute;
+	left:245px;
+	top:11px;
+	height: 300px;
+	width: 300px;
+	background:url(../images/dt.png) no-repeat;
+}
+.wzdd img{ border-radius:200px; height:280px; width:280px; border:4px solid #fff; position:relative; z-index:10; behavior: url(/pie.htc);}
+.wztb{
+	position:absolute;
+	left:260px;
+	top:21px;
+	background:url(/images/wztb.png) no-repeat;
+	width:49px;
+	height:59px;
+	z-index:50;
+}

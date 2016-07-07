@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+
+public partial class admin_psw : System.Web.UI.Page
+{
+    SqlConnection sqlcon;
+    SqlDb db = new SqlDb();
+    SqlCommand sqlcom;
+    qzjx.Model.admins adminModel = null;
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        SessionHelper.UserInfo userinfo = SessionHelper.CheckLogin();
+        if (userinfo == null || userinfo.TableName != SessionHelper.LoginType.Admin)
+        {
+            Response.Redirect("default.aspx");
+            return;
+        }
+        adminModel = userinfo.Entity as qzjx.Model.admins;
+    }
+
+    protected void btnsubmit_Click(object sender, EventArgs e)
+    {
+        qzjx.BLL.admins adminsBLL = new qzjx.BLL.admins();
+
+        string password = adminModel.password;
+        string stroldPwd = FormsAuthentication.HashPasswordForStoringInConfigFile(txtoldpwd.Text, "MD5");
+        if (String.Equals(password, stroldPwd, StringComparison.CurrentCultureIgnoreCase))
+        {
+            string strPwd = FormsAuthentication.HashPasswordForStoringInConfigFile(txtPwd.Text, "MD5");
+            adminModel.password = strPwd;
+            if (adminsBLL.Update(adminModel))
+            {
+                WebMessageBox.AdminShow("密码修改成功!请重新登录!", "Default.aspx");
+                Session.Clear();
+            }
+            else
+            {
+                WebMessageBox.Show("修改密码失败");
+            }
+        }
+        else
+        {
+            WebMessageBox.Show("原密码错误!", "psw.aspx");
+        }
+    }
+}

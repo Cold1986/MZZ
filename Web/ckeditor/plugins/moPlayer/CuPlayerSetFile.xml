@@ -1,0 +1,7 @@
+﻿<content>
+  <CuPlayerWidth>600</CuPlayerWidth>
+  <CuPlayerHeight>410</CuPlayerHeight>
+  <CuPlayerAutoPlay>no</CuPlayerAutoPlay>    
+  <CuPlayerImage>content/image/fish.png</CuPlayerImage>
+  <CuPlayerFile>cebbank.flv</CuPlayerFile>
+</content>

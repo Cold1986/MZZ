@@ -1,0 +1,131 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+
+
+public partial class newadmin_user_list : System.Web.UI.Page
+{
+    public int inumber = 1;
+    public int CurPage;
+    PagedDataSource PDS = new PagedDataSource();
+    string strCon = ConfigurationManager.AppSettings["ConnectionString"];
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        SessionHelper.UserInfo userinfo = SessionHelper.CheckLogin();
+        if (userinfo == null || userinfo.TableName != SessionHelper.LoginType.Admin)
+        {
+            Response.Redirect("default.aspx");
+            return;
+        }
+        BuildPage();
+    }
+
+    void BuildPage()
+    {
+
+        int TotalCount = 0;
+        int TotalPage = 2;
+        MZZ.BLL.users user = new MZZ.BLL.users();
+
+        string searchStr = "";
+        string nickname = Request.QueryString["nickname"];
+        string openid = Request.QueryString["openid"];
+        if (!string.IsNullOrEmpty(nickname))
+        {
+            searchStr += " and Nickname='" + nickname + "'";
+        }
+        if (!string.IsNullOrEmpty(openid))
+        {
+            searchStr += " and Openid='" + openid + "'";
+        }
+
+        DataSet ds = user.GetList("1=1 " + searchStr + "order by id desc");
+        DataView dv = ds.Tables[0].DefaultView;
+        TotalCount = dv.Count;
+        PDS.DataSource = dv;
+        PDS.AllowPaging = true;
+        PDS.PageSize = 10;
+
+        if (Request.QueryString["Page"] != null && Request.QueryString["Page"] != "")
+        {
+            CurPage = Convert.ToInt32(Request.QueryString["Page"]);
+        }
+        else
+            CurPage = 1;
+
+        if (TotalCount == 0)
+        {
+            TotalPage = 1;
+
+        }
+        else
+        {
+            if (TotalCount % PDS.PageSize == 0)
+                TotalPage = TotalCount / PDS.PageSize;
+            else
+                TotalPage = TotalCount / PDS.PageSize + 1;
+        }
+        PDS.CurrentPageIndex = CurPage - 1;
+        lblCurrentPage.Text = "共" + TotalCount.ToString() + "条记录 当前页：" + CurPage.ToString() + "/" + TotalPage;
+        lnkFrist.HRef = Request.CurrentExecutionFilePath + "?Page=1&title=" + Request.QueryString["title"] + "&times=" + Request.QueryString["times"] + "";
+        if (!PDS.IsFirstPage)
+            lnkPrev.HRef = Request.CurrentExecutionFilePath + "?page=" + Convert.ToString(CurPage - 1) + "&title=" + Request.QueryString["title"] + "&times=" + Request.QueryString["times"] + "";
+        if (!PDS.IsLastPage)
+            lnkNext.HRef = Request.CurrentExecutionFilePath + "?Page=" + Convert.ToString(CurPage + 1) + "&title=" + Request.QueryString["title"] + "&times=" + Request.QueryString["times"] + "";
+        lnkEnd.HRef = Request.CurrentExecutionFilePath + "?Page=" + TotalPage + "&title=" + Request.QueryString["title"] + "&times=" + Request.QueryString["times"] + "";
+        Repeater1.DataSource = PDS;
+        Repeater1.DataBind();
+    }
+
+    protected void btnDeleteMore_Click(object sender, EventArgs e)
+    {
+        string sql = "(";
+        for (int i = 0; i < Repeater1.Items.Count; i++)
+        {
+            CheckBox cb = (CheckBox)Repeater1.Items[i].FindControl("CheckBox1");
+            if (cb.Checked == true)
+            {
+                Label lbid = (Label)Repeater1.Items[i].FindControl("lbid");
+                sql = sql + lbid.Text.ToString() + ",";
+            }
+        }
+        //去掉最后的逗号,并且加上右手号 
+        sql = sql.Substring(0, sql.Length - 1) + ")";
+        sql = "delete [user] where id in" + sql;
+        SqlConnection sqlcon = new SqlConnection(strCon);
+        sqlcon.Open();
+        try
+        {
+            //执行删除语句 
+            SqlCommand cmd = new SqlCommand(sql, sqlcon);
+            int delcount = Convert.ToInt32(cmd.ExecuteNonQuery());
+            Response.Write("<script>alert('共删除" + delcount + "条数据');location.href='userinfo_list.aspx?page=" + Request.QueryString["page"] + "&usertext=" + Request.QueryString["usertext"] + "&mail=" + Request.QueryString["mail"] + "&san=" + Request.QueryString["san"] + "&zhuangtai=" + Request.QueryString["zhuangtai"] + "'</script>");
+        }
+        catch (Exception ex)
+        {
+            Response.Write(ex.Message);
+        }
+        finally
+        {
+            sqlcon.Close();
+        }
+    }
+    protected void btnGetUserList_Click(object sender, EventArgs e)
+    {
+        if (new WxUser().GetUserList())
+        {
+            WebMessageBox.Show("同步成功");
+        }
+        else
+        {
+            WebMessageBox.Show("同步失败");
+        }
+    }
+}

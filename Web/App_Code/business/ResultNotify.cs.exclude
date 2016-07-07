@@ -1,0 +1,365 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Linq;
+using LitJson;
+using System.Web.Security;
+using WxPayAPI;
+using Maticsoft.DBUtility;
+
+namespace WxPayAPI
+{
+    /// <summary>
+    /// 支付结果通知回调处理类
+    /// 负责接收微信支付后台发送的支付结果并对订单有效性进行验证，将验证结果反馈给微信支付后台
+    /// </summary>
+    public class ResultNotify : Notify
+    {
+        public ResultNotify(Page page)
+            : base(page)
+        {
+        }
+
+        public override void ProcessNotify()
+        {
+            WxPayData notifyData = GetNotifyData();
+
+            string orderno = notifyData.GetValue("out_trade_no").ToString();
+
+            //检查支付结果中transaction_id是否存在
+            if (!notifyData.IsSet("transaction_id"))
+            {
+                //若transaction_id不存在，则立即返回结果给微信支付后台
+                WxPayData res = new WxPayData();
+                res.SetValue("return_code", "FAIL");
+                res.SetValue("return_msg", "支付结果中微信订单号不存在");
+                Log.Error(this.GetType().ToString(), "The Pay result is error : " + notifyData.ToXml());
+
+                if (!HouseOrderFail(orderno, notifyData))
+                {
+                    if (!CakeOrderFail(orderno, notifyData))
+                    {
+                        if (!MealOrderFail(orderno, notifyData))
+                        {
+                            Log.Info(this.GetType().ToString(), "订单不存在 : " + notifyData.ToXml());
+                        }
+                    }
+                }
+
+                Log.Info(this.GetType().ToString(), "回复微信服务器 : " + res.ToXml());
+                page.Response.Write(res.ToXml());
+                page.Response.End();
+            }
+
+            string transaction_id = notifyData.GetValue("transaction_id").ToString();
+            //查询订单，判断订单真实性
+            if (!QueryOrder(transaction_id))
+            {
+                //若订单查询失败，则立即返回结果给微信支付后台
+                WxPayData res = new WxPayData();
+                res.SetValue("return_code", "FAIL");
+                res.SetValue("return_msg", "订单查询失败");
+                Log.Error(this.GetType().ToString(), "Order query failure : " + notifyData.ToXml());
+
+                if (!HouseOrderFail(orderno, notifyData))
+                {
+                    if (!CakeOrderFail(orderno, notifyData))
+                    {
+                        if (!MealOrderFail(orderno, notifyData))
+                        {
+                            Log.Info(this.GetType().ToString(), "订单不存在 : " + notifyData.ToXml());
+                        }
+                    }
+                }
+
+                Log.Info(this.GetType().ToString(), "回复微信服务器 : " + res.ToXml());
+                page.Response.Write(res.ToXml());
+                page.Response.End();
+            }
+            //查询订单成功
+            else
+            {
+                WxPayData res = new WxPayData();
+                res.SetValue("return_code", "SUCCESS");
+                res.SetValue("return_msg", "OK");
+                Log.Info(this.GetType().ToString(), "order query success : " + notifyData.ToXml());
+                string posttime = System.DateTime.Now.ToString();
+                CHelper.WriteLog("orderid", orderno);
+
+                if (!HouseOrderSuccess(orderno, notifyData))
+                {
+                    if (!CakeOrderSuccess(orderno, notifyData))
+                    {
+                        if (!MealOrderSuccess(orderno, notifyData))
+                        {
+                            Log.Info(this.GetType().ToString(), "订单不存在 : " + notifyData.ToXml());
+                        }
+                    }
+                }
+                Log.Info(this.GetType().ToString(), "回复微信服务器 : " + res.ToXml());
+                page.Response.Write(res.ToXml());
+                page.Response.End();
+            }
+        }
+
+
+        //发送Email
+        delegate bool SendEmail(JieEn.Model.HotelOrder horderModel);
+        //发送Email(蛋糕)
+        delegate bool SendEmail2(JieEn.Model.CakeOrder corderModel);
+        //发送Email(早餐券)
+        delegate bool SendEmail3(JieEn.Model.MealCardOrder mcorderModel);
+
+        JieEn.BLL.HotelOrder horderBLL = new JieEn.BLL.HotelOrder();
+        JieEn.BLL.UserCard userCardBLL = new JieEn.BLL.UserCard();
+        JieEn.BLL.CakeOrder corderBLL = new JieEn.BLL.CakeOrder();
+        JieEn.BLL.MealCardOrder mealcardBLL = new JieEn.BLL.MealCardOrder();
+        JieEn.BLL.UserMealCard ucmBLL = new JieEn.BLL.UserMealCard();
+
+
+        #region 房间订单
+        private bool HouseOrderSuccess(string orderno, WxPayData notifyData)
+        {
+            var horderModelList = horderBLL.GetModelList("OrderNo='" + orderno + "'");
+
+            if (horderModelList.Count > 0)
+            {
+                JieEn.Model.HotelOrder horderModel = horderModelList[0];
+                if (horderModel.Status == (int)StatusEntity.OrderStatus.待付款 || horderModel.Status == (int)StatusEntity.OrderStatus.付款失败)
+                {
+                    horderModel.Status = (int)StatusEntity.OrderStatus.已付款;
+                    horderModel.Xml = notifyData.ToXml();
+                    horderModel.PayTime = DateTime.ParseExact(notifyData.GetValue("time_end").ToString(), "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
+                    horderBLL.Update(horderModel);
+
+                    var userCardModel = userCardBLL.GetModel(horderModel.UserCardId);
+                    if (userCardModel != null && (userCardModel.Status == (int)StatusEntity.UserCardStatus.使用中 || userCardModel.Status == (int)StatusEntity.UserCardStatus.正常))
+                    {
+                        userCardModel.Status = (int)StatusEntity.UserCardStatus.已使用;
+                        userCardBLL.Update(userCardModel);
+                    }
+
+                    //发送红包
+                    SendHongBao(horderModel);
+
+                    //发送Email
+                    SendEmail sendEmail = new SendEmail(SendCard.SendEmail);
+                    sendEmail.BeginInvoke(horderModel, null, null);
+
+                    Log.Info(this.GetType().ToString(), "订单付款成功信息, out_trade_no:" + orderno);
+                }
+                else
+                {
+                    Log.Info(this.GetType().ToString(), "微信发送重复信息, out_trade_no:" + orderno);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private bool HouseOrderFail(string orderno, WxPayData notifyData)
+        {
+            var horderModelList = horderBLL.GetModelList("OrderNo='" + orderno + "'");
+
+            if (horderModelList.Count > 0)
+            {
+                JieEn.Model.HotelOrder horderModel = horderModelList[0];
+                horderModel.Status = (int)StatusEntity.OrderStatus.付款失败;
+                horderModel.Xml = notifyData.ToXml();
+                horderModel.PayTime = DateTime.ParseExact(notifyData.GetValue("time_end").ToString(), "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
+                horderBLL.Update(horderModel);
+
+                var userCardModel = userCardBLL.GetModel(horderModel.UserCardId);
+                if (userCardModel != null && userCardModel.Status == (int)StatusEntity.UserCardStatus.使用中)
+                {
+                    userCardModel.Status = (int)StatusEntity.UserCardStatus.正常;
+                    userCardBLL.Update(userCardModel);
+                }
+
+                //TemplateMsg.RegistrationMsg("" + openid + "", "" + myname + "", "" + code + "", "工作日9：00-17：00", "上海市闵行区莘东路508号或沁春路179号");
+                Log.Info(this.GetType().ToString(), "订单付款失败信息, out_trade_no:" + orderno);
+                return true;
+            }
+            return false;
+        }
+        #endregion
+
+        #region 蛋糕订单
+        private bool CakeOrderSuccess(string orderno, WxPayData notifyData)
+        {
+            var corderModelList = corderBLL.GetModelList("OrderNo='" + orderno + "'");
+
+            if (corderModelList.Count > 0)
+            {
+                JieEn.Model.CakeOrder corderModel = corderModelList[0];
+                if (corderModel.Status == (int)StatusEntity.OrderStatus.待付款 || corderModel.Status == (int)StatusEntity.OrderStatus.付款失败)
+                {
+                    corderModel.Status = (int)StatusEntity.OrderStatus.已付款;
+                    corderModel.Xml = notifyData.ToXml();
+                    corderModel.PayTime = DateTime.ParseExact(notifyData.GetValue("time_end").ToString(), "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
+                    corderBLL.Update(corderModel);
+
+                    //发送Email
+                    SendEmail2 sendEmail2 = new SendEmail2(SendCard.SendEmail2);
+                    sendEmail2.BeginInvoke(corderModel, null, null);
+
+                    Log.Info(this.GetType().ToString(), "订单付款成功信息, out_trade_no:" + orderno);
+                }
+                else
+                {
+                    Log.Info(this.GetType().ToString(), "微信发送重复信息, out_trade_no:" + orderno);
+                }
+                return true;
+
+            }
+            return false;
+        }
+
+        private bool CakeOrderFail(string orderno, WxPayData notifyData)
+        {
+            var corderModelList = corderBLL.GetModelList("OrderNo='" + orderno + "'");
+
+            if (corderModelList.Count > 0)
+            {
+                JieEn.Model.CakeOrder corderModel = corderModelList[0];
+                corderModel.Status = (int)StatusEntity.OrderStatus.付款失败;
+                corderModel.Xml = notifyData.ToXml();
+                corderModel.PayTime = DateTime.ParseExact(notifyData.GetValue("time_end").ToString(), "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
+                corderBLL.Update(corderModel);
+
+                Log.Info(this.GetType().ToString(), "订单付款失败信息, out_trade_no:" + orderno);
+                return true;
+            }
+            return false;
+        }
+        #endregion
+
+        #region 用餐券订单
+        private bool MealOrderSuccess(string orderno, WxPayData notifyData)
+        {
+            var mcModelList = mealcardBLL.GetModelList("OrderNo='" + orderno + "'");
+            if (mcModelList.Count > 0)
+            {
+                JieEn.Model.MealCardOrder oModel = mcModelList[0];
+                if (oModel.Status == (int)StatusEntity.OrderStatus.待付款 || oModel.Status == (int)StatusEntity.OrderStatus.付款失败)
+                {
+                    oModel.Status = (int)StatusEntity.OrderStatus.已付款;
+                    oModel.Xml = notifyData.ToXml();
+                    oModel.PayTime = DateTime.ParseExact(notifyData.GetValue("time_end").ToString(), "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
+                    mealcardBLL.Update(oModel);
+
+                    for (int i = 0; i < oModel.Count; i++)
+                    {
+                        var ucModel = new JieEn.Model.UserMealCard();
+                        ucModel.UserId = oModel.UserId;
+                        ucModel.OrderId = oModel.ID;
+                        ucModel.EndTime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd 23:59:59"));
+                        ucModel.Status = (int)StatusEntity.UserMealCardStatus.正常;
+                        ucmBLL.Add(ucModel);
+                    }
+
+                    //发送Email
+                    SendEmail3 sendEmail3 = new SendEmail3(SendCard.SendEmail3);
+                    sendEmail3.BeginInvoke(oModel, null, null);
+
+                    Log.Info(this.GetType().ToString(), "订单付款成功信息, out_trade_no:" + orderno);
+                }
+                else
+                {
+                    Log.Info(this.GetType().ToString(), "微信发送重复信息, out_trade_no:" + orderno);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private bool MealOrderFail(string orderno, WxPayData notifyData)
+        {
+            var mcModelList = mealcardBLL.GetModelList("OrderNo='" + orderno + "'");
+            if (mcModelList.Count > 0)
+            {
+                JieEn.Model.MealCardOrder mcorderModel = mcModelList[0];
+                mcorderModel.Status = (int)StatusEntity.OrderStatus.付款失败;
+                mcorderModel.Xml = notifyData.ToXml();
+                mcorderModel.PayTime = DateTime.ParseExact(notifyData.GetValue("time_end").ToString(), "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
+                mealcardBLL.Update(mcorderModel);
+
+                Log.Info(this.GetType().ToString(), "订单付款失败信息, out_trade_no:" + orderno);
+                return true;
+            }
+            return false;
+        }
+        #endregion
+
+
+        //查询订单
+        private bool QueryOrder(string transaction_id)
+        {
+            WxPayData req = new WxPayData();
+            req.SetValue("transaction_id", transaction_id);
+            WxPayData res = WxPayApi.OrderQuery(req);
+            if (res.GetValue("return_code").ToString() == "SUCCESS" &&
+                res.GetValue("result_code").ToString() == "SUCCESS")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        //发送红包
+        private void SendHongBao(JieEn.Model.HotelOrder model)
+        {
+            if (model == null)
+                return;
+
+            JieEn.BLL.User userBLL = new JieEn.BLL.User();
+            //会员
+            var userModel = userBLL.GetModel(model.UserId);
+
+            //上线
+            var upModel = userBLL.GetModelList("OpenId='" + model.uopenid + "'").FirstOrDefault();
+            if (upModel == null || string.IsNullOrEmpty(upModel.OpenId))
+                return;
+
+            string strSql = "select top 1 id from WxHongBao where order_id={0} and type_name='订房'";
+            DataSet ds = DbHelperSQL.Query(string.Format(strSql, model.ID));
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                //红包已经发送过了
+                return;
+            }
+            else
+            {
+                JieEn.Model.WxHongBao hbModel = new JieEn.Model.WxHongBao();
+                hbModel.order_id = (int)model.ID;
+                hbModel.re_openid = model.uopenid;
+                hbModel.type_name = "订房";
+                hbModel.total_amount = 1000;
+                hbModel.create_time = DateTime.Now;
+                hbModel.timestamp = CHelper.TimeToUnixTime(hbModel.create_time).ToString();
+                hbModel.nonce = Guid.NewGuid().ToString().Replace("-", "").ToLower();
+
+                JieEn.BLL.WxHongBao hbBLL = new JieEn.BLL.WxHongBao();
+                int hbid = hbBLL.Add(hbModel);
+                if (hbid > 0)
+                {
+                    string act_name = "推荐订房红包";
+                    string remark = "推荐更多领取更多";
+                    var result = wxHbPay.SendRedPack(hbModel.re_openid, hbModel.total_amount, hbid, act_name, remark);
+                    if (string.IsNullOrEmpty(result.errorMsg))
+                    {
+                        //发送成功
+                        string money = NumHelper.CentToDollar(hbModel.total_amount).ToString();
+                        new TemplateMsg().SendHbMsg(hbModel.re_openid, model.OrderNo, userModel.NickName, money);
+                    }
+                }
+            }
+        }
+    }
+}

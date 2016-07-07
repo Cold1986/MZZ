@@ -1,0 +1,76 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="psw.aspx.cs" Inherits="admin_psw" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="css/grobal.css" rel="stylesheet" type="text/css" />
+    <link href="css/inner.css" rel="stylesheet" type="text/css" />
+    <!--[if lt IE 9]><script src="js/html5.js"></script><![endif]-->
+    <SCRIPT type=text/javascript src="js/jquery-1.9.1.min.js"></SCRIPT>
+    <SCRIPT type=text/javascript src="js/inner.js"></SCRIPT>
+    <script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+
+    <!--[if lt IE 7]>
+    <script src="js/DD_belatedPNG_0.0.8a.js" type="text/javascript"></script>
+        <script type="text/javascript">
+           DD_belatedPNG.fix('div,img, li,a,h1');
+        </script>
+    <![endif]-->
+
+    <script type="text/javascript">
+    <!--
+        function chk() {
+            var theForm = document.getElementById("form1");
+            if (theForm.TextBox1.value == "") {
+                alert("请输入项目名称!");
+                theForm.TextBox1.focus();
+                return false;
+            }
+
+            if (isNaN(theForm.TextBox2.value)) {
+                alert("请输入数字！");
+                theForm.TextBox2.focus();
+                return false;
+            }
+            return true;
+
+        }
+    //-->
+    </script>
+</head>
+<body class="lightgrey" style="padding-top:10px;">
+    <form id="form1" runat="server">
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td><h1 class="box_title"><img src="images/edit.gif"  /> 修改后台密码</h1></td>
+    </tr>
+    <tr>
+    <td align="center" style="padding-top:10px;">
+        <table cellpadding="0" cellspacing="1" border="0" width="90%" class="edit">
+            <tr>
+	            <td width="100" align="left" valign="top">旧密码</td>
+                <td align="left"><asp:TextBox ID="txtoldpwd" name="pactid" runat="server" class="fl" TextMode="Password"></asp:TextBox></td>
+            </tr>
+            <tr>
+	            <td width="100" align="left" valign="top">新密码</td>
+                <td align="left"><asp:TextBox ID="txtPwd" runat="server" class="fl" TextMode="Password"></asp:TextBox><asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="txtPwd" ErrorMessage="*请输入密码"></asp:RequiredFieldValidator></td>
+            </tr>
+            <tr>
+	            <td width="100" align="left" valign="top">重复密码</td>
+                <td align="left"><asp:TextBox ID="txtPassword" runat="server" class="fl" TextMode="Password"></asp:TextBox><asp:CompareValidator ID="CompareValidator1" runat="server" ControlToCompare="txtPwd" ControlToValidate="txtPassword" ErrorMessage="*两次密码不一致"></asp:CompareValidator></td>
+            </tr>
+            <tr>
+              <td colspan="2" align="center">
+  	              <asp:Button ID="btnsubmit" class="btn" runat="server" 
+                      OnClientClick="return chk()"   Text="确定" onclick="btnsubmit_Click" />
+              </td>
+            </tr>
+        </table>
+    </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

@@ -1,0 +1,134 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using WeiXinSDK.Pay;
+
+/// <summary>
+///wxHbPay 微信现金红包
+/// </summary>
+public class wxHbPay
+{
+    /// <summary>
+    /// 发送现金红包
+    /// 需要证书
+    /// </summary>
+    /// <param name="re_openid">接收红包的用户Id</param>
+    /// <param name="money">红包金额（单位：分）</param>
+    /// <returns>返回订单号。-1，0程序错误</returns>
+    public static HbResult SendRedPack(string re_openid, int money, int hbid, string act_name, string remark)
+    {
+        HbResult hbResult = new HbResult();
+        try
+        {
+            JieEn.BLL.WxHongBao hbOrder = new JieEn.BLL.WxHongBao();
+            JieEn.Model.WxHongBao model = hbOrder.GetModel(hbid);
+            if (model == null)
+            {
+                hbResult.errorMsg = "红包订单不存在";
+                return hbResult;
+            }
+            if (model.mch_billno != "")
+            {
+                hbResult.errorMsg = "红包已经发送过了";
+                return hbResult;
+            }
+
+            //参数
+            string nonce_str = DateTime.Now.Ticks.ToString();
+            string mch_billno = CreateMchBillNo();
+            string sub_mch_id = "";
+            string nick_name = "南洋国际大酒店";
+            string send_name = "南洋国际大酒店";
+            int total_amount = money;
+            int min_value = money;
+            int max_value = money;
+            int total_num = 1;
+            string wishing = "恭喜您获得订房推荐红包！";
+            string client_ip = "117.135.144.19";
+            string logo_imgurl = "";
+            string share_content = "";
+            string share_url = "";
+            string share_imgurl = "";
+
+            AppInfo appInfo = AppInfo.GetGetAppInfo();
+            string xml = WxHbPayAPI.SendRedPack(nonce_str, mch_billno, appInfo.mch_id,
+                                         sub_mch_id, appInfo.appid, nick_name, send_name,
+                                         re_openid, total_amount, min_value, max_value,
+                                         total_num, wishing, client_ip, act_name,
+                                         remark, logo_imgurl, share_content, share_url,
+                                         share_imgurl, appInfo.PartnerKey, appInfo.cert_path, appInfo.cart_password);
+
+            hbResult.xml = xml;
+            if (!string.IsNullOrEmpty(xml))
+            {
+                Dictionary<string, string> dic = WeiXinSDK.Util.GetDictFromXml(xml);
+                if (dic["return_code"] == "SUCCESS" && dic["result_code"] == "SUCCESS")//成功
+                {
+                    string r1 = dic["mch_billno"];//商户订单号
+                    string r2 = dic["re_openid"];//用户openid
+                    string r3 = dic["total_amount"];//付款金额
+                    string r4 = dic["send_time"];//发放成功时间
+                    string r5 = dic["send_listid"];//红包订单的微信单号
+
+                    model.mch_id = appInfo.mch_id;
+                    model.mch_billno = mch_billno;
+                    model.re_openid = re_openid;
+                    model.total_amount = total_amount;
+                    model.wishing = wishing;
+                    model.act_name = act_name;
+                    model.remark = remark;
+                    model.status = "10";
+                    model.xml = xml;
+                    hbOrder.Update(model);
+
+                    hbResult.mch_billno = model.mch_billno;
+                    hbResult.total_amount = model.total_amount;
+                    hbResult.hbId = model.id;
+                }
+                else
+                {
+                    //出错
+                    hbResult.errorMsg = dic["return_msg"];
+                    CHelper.WriteLog("发送红包失败", hbResult.errorMsg);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            hbResult.errorMsg = ex.Message.Replace("\r\n", "");
+            CHelper.WriteLog("发送红包失败", ex.ToString());
+        }
+
+        return hbResult;
+    }
+
+    public class HbResult
+    {
+        public int hbId = 0;
+        public string mch_billno = "";
+        public int total_amount = 0;
+        public string errorMsg = "";
+        public string xml = "";
+    }
+
+
+    //生成28位订单（mch_id+yyyymmdd+10位一天内不能重复的数字。）
+    public static string CreateMchBillNo()
+    {
+        AppInfo appInfo = AppInfo.GetGetAppInfo();
+        string str1 = appInfo.mch_id + DateTime.Now.ToString("yyyyMMddhhmmss");//十四位
+        string str2 = new Random().Next(1000, 9999).ToString();
+        string mch_billno = str1 + str2;
+        JieEn.BLL.WxHongBao hbOrder = new JieEn.BLL.WxHongBao();
+        var list = hbOrder.GetModelList("mch_billno='" + mch_billno + "'");
+        if (list.Count > 0)//已经存在
+        {
+            return CreateMchBillNo();
+        }
+        else
+        {
+            return mch_billno;
+        }
+    }
+}

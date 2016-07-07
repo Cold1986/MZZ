@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+/// <summary>
+/// wxProduct 的摘要说明
+/// </summary>
+public class WxProduct
+{
+    JieEn.BLL.WxProduct productBLL = new JieEn.BLL.WxProduct();
+
+    public WxProduct()
+    {
+    }
+
+    public bool GetProductList()
+    {
+        //获取产品列表
+        WeiXinSDK.Shop.GetProductListResult productlist = WeiXinSDK.WeiXinShop.GetProductListByStatus(0);
+
+        if (productlist.errcode == 0 && productlist.errmsg == "ok")
+        {
+            List<WeiXinSDK.Shop.Product> productbase = productlist.products_info;
+            if (productbase.Count > 0)
+            {
+                foreach (WeiXinSDK.Shop.Product product in productbase)
+                {
+                    try
+                    {
+                        //添加产品信息到数据库
+                        InsertUpdateProduct(product.product_id, product.product_base.name, product.product_base.main_img,
+                            product.sku_list[0].ori_price, product.sku_list[0].price, product.status);
+                    }
+                    catch
+                    {
+                        CHelper.WriteLog("更新产品", "将产品" + product.product_id + "数据更新回数据库失败！");
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                CHelper.WriteLog("更新产品", "微信产品数量为0！");
+                return true;
+            }
+        }
+        else
+        {
+            CHelper.WriteLog("获取产品列表失败，接口错误", productlist.ToString());
+            return false;
+        }
+    }
+    //添加及更新产品数据到数据库
+    public void InsertUpdateProduct(string productid, string productName, string mainimg, int oriprice, int price, int status)
+    {
+        JieEn.Model.WxProduct productModel = new JieEn.Model.WxProduct();
+        productModel.ProductId = productid;
+        productModel.ProductName = productName;
+        productModel.MainImg = mainimg;
+        productModel.OriPrice = oriprice;
+        productModel.Price = price;
+        productModel.ProductStatus = status;
+
+        var dt = productBLL.GetModelList("productid='" + productid + "'");
+        if (dt.Count > 0)
+        {
+            productBLL.Update(productModel);
+        }
+        else
+        {
+            productBLL.Add(productModel);
+        }
+    }
+}

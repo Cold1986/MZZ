@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class newadmin_article_edit : System.Web.UI.Page
+{
+    JieEn.BLL.News newsBLL = new JieEn.BLL.News();
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        SessionHelper.UserInfo userinfo = SessionHelper.CheckLogin();
+        if (userinfo == null || userinfo.TableName != SessionHelper.LoginType.Admin)
+        {
+            Response.Redirect("default.aspx");
+            return;
+        }
+
+        string Id = Request.QueryString["Id"];
+        int iid = WebHelp.ConvertStringToInt(Id);
+        if (iid == -1)
+        {
+            Response.Write("<script>alert('Id错误！');location.href='index.aspx';</script>");
+            return;
+        }
+
+        if (!IsPostBack)
+        {
+            var newsModel = newsBLL.GetModel(iid);
+
+            if (newsModel != null)
+            {
+                txttitle.Text = newsModel.Title;
+                pic.ImageUrl = "../upload/" + newsModel.Pic;
+                txtdetail.Text = newsModel.Content;
+            }
+        }
+        else
+        {
+            var newsModel = newsBLL.GetModel(iid);
+
+            if (newsModel != null)
+            {
+                string UpFileName = "";
+                if (UpLoadFile.HasFile)
+                {
+                    string filename = UpLoadFile.PostedFile.FileName;
+
+                    UpFileName = PicClass.Pic(filename);
+
+                    if (UpFileName != "格式不正确")
+                    {
+                        this.UpLoadFile.PostedFile.SaveAs(Server.MapPath("../upload") + "\\" + UpFileName);
+                        newsModel.Pic = UpFileName;
+                    }
+                    else
+                    {
+                        UpFileName = "";
+                    }
+                }
+                newsModel.Title = Request.Form["txttitle"];
+                newsModel.Content = Request.Form["txtdetail"];
+                if (UpFileName == "")
+                {
+                    newsModel.Pic = pic.ImageUrl.Replace("../upload/","");
+                }
+                else
+                {
+                    newsModel.Pic = UpFileName;
+                }
+
+                newsBLL.Update(newsModel);
+                WebMessageBox.AdminShow("修改成功！", "article_list.aspx");
+            }
+            else
+            {
+                WebMessageBox.AdminShow("修改失败！", "article_list.aspx");
+            }
+        }
+    }
+}

@@ -1,0 +1,77 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Activity.aspx.cs" Inherits="Activity" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>新用户关注奖励</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"
+        name="viewport" />
+    <meta name="renderer" content="webkit">
+    <meta content="telephone=no" name="format-detection" />
+    <link rel="stylesheet" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/base.js"></script>
+    <script type="text/javascript" src="js/rotate3di.js"></script>
+    <script type="text/javascript">
+        function mySideChange() {
+
+            $('.ktv-quan .ktv-quanimg-1').hide();
+
+            $('.ktv-quan .ktv-quanimg-2').show();
+
+        }
+        function mySideChange2() {
+
+            $('.ktv-quan .ktv-quanimg-1').show();
+
+            $('.ktv-quan .ktv-quanimg-2').hide();
+
+        }
+        $(document).ready(function () {
+
+            $('.ktv-quan .ktv-quanimg-1').click(
+        function () {
+
+            $(this).rotate3Di('flip', 250, { direction: 'clockwise', sideChange: mySideChange });
+            $('.ktv-quan .ktv-quanimg-2').rotate3Di('flip', 250, { direction: 'clockwise', sideChange: mySideChange });
+
+        }
+
+    );
+            $('.ktv-quan .ktv-quanimg-2').click(
+        function () {
+
+            $(this).rotate3Di('flip', 250, { direction: 'clockwise', sideChange: mySideChange2 });
+            $('.ktv-quan .ktv-quanimg-1').rotate3Di('flip', 250, { direction: 'clockwise', sideChange: mySideChange2 });
+
+        }
+
+    );
+            $(".ktv-img-need").on("click", function () {
+                $(this).hide();
+                $(".ktv-si").show();
+                $(".ktv-si-con").slideDown(1000);
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div class="qlbwidth">
+        <div class="ktv-top">
+            <a href="receive.aspx">
+                <img src="images/ktv-bg1.jpg" class="ktv-bg1" /></a>
+        </div>
+        <div class="ktv-share">
+            <img src="images/ktv-img-need.png" class="ktv-bg3" />
+            <img src="images/ktv-img-need.png" class="ktv-share-img1" onclick="openid('fixed-share')" />
+        </div>
+    </div>
+    <div class="fixed100" id="fixed-share" onclick="closeid('fixed-share')">
+        <img src="images/img-share.png" class="img-share" />
+    </div>
+    </form>
+</body>
+</html>

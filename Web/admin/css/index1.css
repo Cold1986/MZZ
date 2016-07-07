@@ -1,0 +1,6 @@
+.index_bg{ background:url(../images/index_bg.jpg) no-repeat; width:1152px; height:864px; position:absolute; left:50%; top:50%; margin-left:-576px; margin-top:-432px;}
+.usertext{ background:none; height:24px; border:0px; position:absolute; top:298px; left:560px; width:235px; line-height:24px; }
+.pswtext{ background:none; height:24px; border:0px; position:absolute; top:336px; left:560px; width:235px; line-height:24px; }
+.yztext{ background:none; height:24px; border:0px; position:absolute; top:372px; left:523px; width:97px; line-height:24px; }
+.login_btn{ background:none; height:28px; border:0px; position:absolute; top:452px; left:383px; width:90px; line-height:24px; cursor:pointer; }
+.reset_btn{ background:none; height:28px; border:0px; position:absolute; top:452px; left:513px; width:90px; line-height:24px; cursor:pointer; }

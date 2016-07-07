@@ -1,0 +1,68 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+
+
+public partial class newadmin_ll_list : System.Web.UI.Page
+{
+    public int inumber = 1;
+    public int CurPage = 1;
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        SessionHelper.UserInfo userinfo = SessionHelper.CheckLogin();
+        if (userinfo == null || userinfo.TableName != SessionHelper.LoginType.Admin)
+        {
+            Response.Redirect("default.aspx");
+            return;
+        }
+        BuildPage();
+    }
+
+    void BuildPage()
+    {
+        int TotalCount = 0, TotalPage = 1, pagesize = 10;
+        if (Request.QueryString["Page"] != null && Request.QueryString["Page"] != "")
+        {
+            CurPage = Convert.ToInt32(Request.QueryString["Page"]);
+        }
+        else
+            CurPage = 1;
+
+        string timestamp = DateTime.Now.ToString();
+        List<string> tmpList = new List<string>();
+        tmpList.Add(LiuLiang.USERID);
+        tmpList.Add(LiuLiang.USERNAME);
+        tmpList.Add(LiuLiang.PARTNERKEY);
+        tmpList.Add(timestamp);
+        tmpList.Sort();
+        string tmpStr = string.Join("", tmpList.ToArray());
+        string signature = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(tmpStr, "MD5");
+
+        string url = LiuLiang.URL + "?act=getlist&userid={0}&username={1}&timestamp={2}&signature={3}&page={4}";
+        url = string.Format(url, LiuLiang.USERID, LiuLiang.USERNAME, timestamp, signature, CurPage);
+        CHelper.WriteLog("getbyid", url);
+        var json = WeiXinSDK.Util.HttpGet2(url);
+        LiuLiang.OrderListResult result = WeiXinSDK.Util.JsonTo<LiuLiang.OrderListResult>(json);
+
+        if (result.errcode == 0 && result.Result.OrderList.Count > 0)
+        {
+            TotalCount = result.Result.RecordCount;
+            TotalPage = (TotalCount + pagesize - 1) / pagesize;
+            lblCurrentPage.Text = "共" + TotalCount.ToString() + "条记录 当前页：" + CurPage.ToString() + "/" + TotalPage;
+            lnkFrist.HRef = Request.CurrentExecutionFilePath + "?Page=1&title=" + Request.QueryString["title"] + "&times=" + Request.QueryString["times"] + "";
+            if (CurPage != 1)
+                lnkPrev.HRef = Request.CurrentExecutionFilePath + "?page=" + Convert.ToString(CurPage - 1) + "&title=" + Request.QueryString["title"] + "&times=" + Request.QueryString["times"] + "";
+            if (CurPage != TotalPage)
+                lnkNext.HRef = Request.CurrentExecutionFilePath + "?Page=" + Convert.ToString(CurPage + 1) + "&title=" + Request.QueryString["title"] + "&times=" + Request.QueryString["times"] + "";
+            lnkEnd.HRef = Request.CurrentExecutionFilePath + "?Page=" + TotalPage + "&title=" + Request.QueryString["title"] + "&times=" + Request.QueryString["times"] + "";
+            Repeater1.DataSource = result.Result.OrderList;
+            Repeater1.DataBind();
+        }
+    }
+}

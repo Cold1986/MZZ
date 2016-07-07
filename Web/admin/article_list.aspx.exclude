@@ -1,0 +1,203 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="article_list.aspx.cs" Inherits="newadmin_article_list" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>无标题页</title>
+    <link href="css/grobal.css" rel="stylesheet" type="text/css" />
+    <link href="css/inner.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="css/datepicker.css" type="text/css" />
+    <!--[if lt IE 9]><script src="js/html5.js"></script><![endif]-->
+
+    <script type="text/javascript" language="javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/inner.js"></script>
+    <script type="text/javascript" src="js/datepicker.js"></script>
+    <script type="text/javascript" src="js/pinyin.js"></script>
+    <script type="text/javascript" src="js/moveajax.js"></script>
+    <link href="../My97DatePicker/skin/WdatePicker.css" rel="stylesheet" type="text/css" />
+    <script language="javascript" type="text/javascript" src="../My97DatePicker/WdatePicker.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('.inputDate').DatePicker({
+                format: 'Y-m-d',
+                date: $('#inputDate').val(),
+                current: $('#inputDate').val(),
+                starts: 1,
+                position: 'right',
+                onBeforeShow: function () {
+                    $('#inputDate').DatePickerSetDate(new Date(), true);
+
+                },
+                onChange: function (formated, dates) {
+                    $('#inputDate').val(formated);
+                    $('#inputDate').DatePickerHide();
+                }
+            });
+        })
+    </script>
+    <!--[if lt IE 7]>
+    <script src="js/DD_belatedPNG_0.0.8a.js" type="text/javascript"></script>
+        <script type="text/javascript">
+           DD_belatedPNG.fix('div,img, li,a,h1');
+        </script>
+    <![endif]-->
+    <script type="text/javascript">
+        function quanxuan() {
+            var obj = document.getElementById("tocheckall");
+            if (obj.value == "全选") {
+                $("input:checkbox").attr("checked", true); //全部设置为选中
+                obj.value = "取消"
+            }
+            else {
+                $("input:checkbox").attr("checked", false); //全部设置为未选中
+                obj.value = "全选"
+            }
+        }
+        function del() {
+            form2.action = "userinfo_del.asp";
+            form2.submit();
+        }
+    </script>
+</head>
+<body class="grey">
+
+    <div class="edit_box">
+        <h1 class="blue">
+            <span>编辑信息</span><a href="javascript:;"></a></h1>
+    </div>
+    <div class="add_bg2">
+    </div>
+    <script>
+
+        function gotoViewPage(num) {
+            if (isNaN(num)) {
+                alert("请输入数字！");
+                return false;
+            }
+            var pageurl = "article_list.aspx?";
+            location.href = pageurl + "&Page= " + num + "&title=" + $('#title').val();
+        }
+
+        $(document).ready(function () {
+            $("#norSearch").click(function () {
+                location.href = "article_list.aspx?title=" + $('#title').val();
+            })
+        })
+    </script>
+    <div class="control_1">
+        <ul>
+            <li class="add"><a href="#" title="登记人员"></a></li>
+            <li class="modify"><a href="#" title="修改信息"></a></li>
+        </ul>
+        <div class="control1_bg">
+        </div>
+    </div>
+    <div class="em_c">
+        <h1>文章管理</h1>
+        <dl>
+            <form name="form1" runat="server" id="form2">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                        <td width="5%" valign="top" class="title2">查询</td>
+
+                        <td width="20%" valign="top"><span>按标题查询</span><input type="text" class="text" id="title" /></td>
+                        <td width="20%" valign="top"><span></span></td>
+                        <td width="20%" valign="top"><span></span></td>
+                        <td width="10%" align="right" valign="top">
+                            <button class="btn-blue" type="button" id="norSearch">
+                                <i class="icon-search-fff"></i>查询</button><br />
+                            <br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="5%" valign="top" class="title2"></td>
+
+                        <td width="20%" valign="top"><span></span></td>
+                        <td width="20%" valign="top"><span></span></td>
+                        <td width="20%" valign="top"><span></span></td>
+                        <td style="float: right;">
+                            <button class="btn" type="button" onclick="location.href='article_list.aspx'" id="norAll">
+                                <i class="icon-retweet"></i>全部</button>
+                        </td>
+                    </tr>
+                </table>
+        </dl>
+        <div class="em_table">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                    <td width="50%" align="left"></td>
+                    <td width="50%" align="right"></td>
+                </tr>
+            </table>
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="em_t">
+                <tr class="title3">
+                    <td width="2%" align="center" valign="middle">
+                        <input name="tocheckall" id="tocheckall" type="checkbox" style="border: 0px" title="选中或清除本页所有" onclick="javascript: quanxuan();" value="全选" /></td>
+                    <td width="5%" align="center" valign="middle">编号</td>
+                    <td width="10%" align="center" valign="middle">图片</td>
+                    <td width="25%" align="center" valign="middle">标题</td>
+                    <td width="10%" align="center" valign="middle">时间</td>
+                    <td width="10%" align="center" valign="middle">操作</td>
+                </tr>
+
+                <asp:Repeater ID="Repeater1" runat="server">
+                    <ItemTemplate>
+                        <tr>
+                            <td align="center" valign="middle">
+                                <asp:CheckBox ID="CheckBox1" runat="server" /><asp:Label ID="lbid" runat="server"
+                                    Text='<%# Eval("Id") %>' Visible="false"></asp:Label>
+                            </td>
+                            <td align="center" valign="middle"><%# Eval("Id")%></td>
+                            <td align="center" valign="middle">
+                                <img src="../upload/<%# DataBinder.Eval(Container.DataItem,"pic") %>" alt="" width="310" height="140"></td>
+                            <td align="center" valign="middle"><%# Eval("Title")%></td>
+                            <td align="center" valign="middle"><%# Eval("CreateTime")%></td>
+                            <td align="center" valign="middle" class="me_t_con">
+                                <a href="javascript:;" rel="article_edit.aspx?id=<%# Eval("ID") %>&page=<%=Request.QueryString["page"]%>" class="ActionA RecordEdit floattable" title="编辑信息"></a></td>
+                        </tr>
+                    </ItemTemplate>
+                </asp:Repeater>
+
+
+            </table>
+
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="padding-top: 5px;">
+                <tr>
+                    <td width="50%" align="left">
+                        <div class="x clearfix fn-left">
+                            <div class="crm_toolbar_left"></div>
+                            <div class="crm_toolbar_center">
+                                <ul class="crm_action">
+                                    <li>
+                                        <a href="javascript:;" class="ActionA RecordNew floattable" rel="article_add.aspx" id="action_1">新建</a>&nbsp;&nbsp; 
+                            <asp:LinkButton runat="server" CssClass="ActionA RecordDel"
+                                ID="on_1" OnClick="btnDeleteMore_Click" OnClientClick="return confirm('确定删除吗？');">删除</asp:LinkButton></li>
+                                </ul>
+                            </div>
+                            <div class="crm_toolbar_right"></div>
+                        </div>
+                    </td>
+                    <td width="50%" align="right">
+                        <table cellpadding="0" cellspacing="0" class="page_bar" width="500px">
+                            <td style="text-align: center;">
+                                <asp:Label ID="lblCurrentPage" runat="server"></asp:Label>&nbsp;
+                    <a href="" id="lnkFrist" runat="server" title="首页">
+                        <img src="images/first_btn.png" /></a>&nbsp;
+                    <a href="" id="lnkPrev" runat="server" title="上一页">
+                        <img src="images/prev_btn.png" /></a>&nbsp;
+                    <a href="" id="lnkNext" runat="server" title="下一页">
+                        <img src="images/next_btn.png" /></a>&nbsp;
+                    <a href="" id="lnkEnd" runat="server" title="尾页">
+                        <img src="images/last_btn.png" /></a>&nbsp;
+                    第&nbsp;<input type="text" name="jumpPage" id="jumpPage" style="width: 30px; height: 16px;" class="efViewTextBox">&nbsp;页<img src="images/go_to.png" onclick="gotoViewPage($('#jumpPage').val());" title="跳转">
+                            </td>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    </form>
+</body>
+</html>

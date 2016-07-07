@@ -1,0 +1,53 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class newadmin_article_add : System.Web.UI.Page
+{
+    JieEn.BLL.News newsBLL = new JieEn.BLL.News();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        SessionHelper.UserInfo userinfo = SessionHelper.CheckLogin();
+        if (userinfo == null || userinfo.TableName != SessionHelper.LoginType.Admin)
+        {
+            Response.Redirect("default.aspx");
+            return;
+        }
+
+        if (IsPostBack)
+        {
+            string UpFileName = "";
+            if (UpLoadFile.HasFile)
+            {
+                string filename = UpLoadFile.PostedFile.FileName;
+
+                UpFileName = PicClass.Pic(filename);
+
+                if (UpFileName != "格式不正确")
+                {
+                    this.UpLoadFile.PostedFile.SaveAs(Server.MapPath("../upload") + "\\" + UpFileName);
+                }
+                else
+                {
+                    UpFileName = "";
+                }
+            }
+            JieEn.Model.News newsModel = new JieEn.Model.News();
+            newsModel.Title = txttitle.Text;
+            newsModel.Content = txtdetail.Text;
+            newsModel.Pic = UpFileName;
+            if (newsBLL.Add(newsModel) > 0)
+            {
+                WebMessageBox.AdminShow("添加成功！", "article_list.aspx");
+            }
+            else
+            {
+                WebMessageBox.AdminShow("添加失败！", "article_list.aspx");
+            }
+        }
+    }
+}

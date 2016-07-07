@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class newadmin_ll_edit : System.Web.UI.Page
+{
+    MZZ.BLL.users blluser = new MZZ.BLL.users();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        SessionHelper.UserInfo userinfo = SessionHelper.CheckLogin();
+        if (userinfo == null || userinfo.TableName != SessionHelper.LoginType.Admin)
+        {
+            Response.Redirect("default.aspx");
+            return;
+        }
+        string src = "ll_list.aspx";
+        string openid = Request.QueryString["openid"];
+        if (!String.IsNullOrEmpty(openid))
+        {
+            MZZ.Model.users muser = blluser.GetModelList("OpenId='" + openid + "'").FirstOrDefault();
+            if (LiuLiang.CreateFirstOrder(muser.OpenId, muser.NickName))
+            {
+                WebMessageBox.AdminDelShow("发送成功！", src);
+            }
+            else
+            {
+                WebMessageBox.AdminDelShow("发送成功！", src);
+            }
+        }
+        else
+        {
+            WebMessageBox.AdminDelShow("发送失败,参数openid不能为空！", src);
+            return;
+        }
+    }
+}

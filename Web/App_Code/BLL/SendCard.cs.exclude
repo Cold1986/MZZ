@@ -1,0 +1,234 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+/// <summary>
+///SendCard 的摘要说明
+/// </summary>
+public class SendCard
+{
+    JieEn.BLL.Card cardBLL = new JieEn.BLL.Card();
+    JieEn.BLL.UserCard userCardBLL = new JieEn.BLL.UserCard();
+    JieEn.BLL.User userBLL = new JieEn.BLL.User();
+    public string ErrMsg = "";
+
+    //首次关注送卡券
+    public bool SendFirstCard(long userId)
+    {
+        ErrMsg = "暂无优惠活动，敬请关注最新公众号通知。";
+        return false;
+
+        //免费券ID
+        string freeCardId = System.Configuration.ConfigurationManager.AppSettings["FreeCardId"];
+        var userCardList = userCardBLL.GetModelList("UserId=" + userId + " and CardId=" + freeCardId + " ");
+        if (userCardList.Count > 0)//已经领取
+        {
+            ErrMsg = "您已经领取过了。";
+            return false;
+        }
+        else//尚未领取
+        {
+            if (RegexUtil.IsNumber(freeCardId))
+            {
+                if (Send(userId, Convert.ToInt32(freeCardId), out ErrMsg))
+                {
+                    return true;
+                }
+            }
+            ErrMsg = "活动还没开始。";
+            return false;
+        }
+    }
+
+    //向指定用户发送卡券
+    public bool Send(long userId, int cardId, out string errMsg)
+    {
+        if (userBLL.GetModel(userId) == null)
+        {
+            errMsg = "用户不存在";
+            return false;
+        }
+        var cardModel = cardBLL.GetModel(cardId);
+        if (cardModel != null && cardModel.Status == (int)StatusEntity.CardStatus.启用)
+        {
+            string code = GenerateOutCode();
+            bool isok = false;
+            while (isok == false)
+            {
+                if (userCardBLL.GetModelList("Code='" + code + "'").Count > 0)
+                {
+                    code = GenerateOutCode();
+                }
+                else
+                {
+                    isok = true;
+                }
+            }
+
+            JieEn.Model.UserCard userCardModel = new JieEn.Model.UserCard();
+            userCardModel.UserId = userId;
+            userCardModel.CardId = cardModel.ID;
+            userCardModel.Title = cardModel.Title;
+            if (cardModel.DataInfoType == (int)TypeEntity.CardDateInfoType.固定日期区间)
+            {
+                userCardModel.BeginTime = cardModel.BeginTime;
+                userCardModel.EndTime = cardModel.EndTime;
+            }
+            else if (cardModel.DataInfoType == (int)TypeEntity.CardDateInfoType.固定时长)
+            {
+                userCardModel.BeginTime = DateTime.Now.AddDays(cardModel.Fixed_begin_time);
+                userCardModel.EndTime = DateTime.Now.AddDays(cardModel.Fixed_begin_time + cardModel.Fixed_term);
+            }
+            else
+            {
+                userCardModel.BeginTime = DateTime.Now;
+                userCardModel.EndTime = DateTime.Now.AddYears(10);
+            }
+            userCardModel.LeastCost = cardModel.LeastCost;
+            userCardModel.CardPrice = cardModel.CardPrice;
+            userCardModel.Status = (int)StatusEntity.UserCardStatus.正常;
+
+            //生成Code
+            userCardModel.Code = code;
+            if (userCardBLL.Add(userCardModel) > 0)
+            {
+                errMsg = "发送卡券成功";
+                return true;
+            }
+            else
+            {
+                errMsg = "发送卡券失败";
+                return false;
+            }
+        }
+        else
+        {
+            errMsg = "卡券不存在";
+            return false;
+        }
+    }
+
+    //发送订单信息
+    public static bool SendEmail(JieEn.Model.HotelOrder orderModel)
+    {
+        JieEn.BLL.User userBLL = new JieEn.BLL.User();
+        var userModel = userBLL.GetModel(orderModel.UserId);
+        if (userModel != null)
+        {
+            new TemplateMsg().BuySuccess(userModel.OpenId, "尊敬的客户，您的订单已经成功支付", orderModel.PayTime.ToString("yyyy-MM-dd HH:mm:ss"), orderModel.Title, NumHelper.CentToDollarStr(orderModel.RealTotalPrice), orderModel.ID.ToString(), orderModel.OrderNo);
+        }
+
+        List<string> openidList = new List<string>();
+        openidList.Add("osfT_tgPLlpnjl2n-1NzBKhtwqms");//婉如
+        openidList.Add("osfT_tvvYUPLPLYKyWaIfTviG7Tg");//珊珊
+        openidList.Add("osfT_tj7bpcp3MFrFVEBbZ4of850");//王凯
+        openidList.Add("osfT_tiXAdsDWqq8x558aQBsDES8");//小燕燕
+        openidList.Add("osfT_tkPBdr-Qg6PQiTgNAhZejgQ");//林蒋丽(Zoe)
+        openidList.Add("osfT_tv56W9zFn8hHamTf08QPGts");//顾珈维(林夕梦@顾顾)
+        openidList.Add("osfT_tpKofierRstv1j8mBf6KKGY");//小燕子穿花衣
+        openidList.Add("osfT_tjfA2COhqQKLYYD2iEn8Dus");//建建
+        openidList.Add("osfT_tnUsqlw0TyRww2qdOI5oKM0");//陶晋
+        foreach (var openid in openidList)
+        {
+            new TemplateMsg().BuySuccess_Admin(openid, "【" + orderModel.UserName + " " + orderModel.Phone + "】的订单已经成功支付", orderModel.PayTime.ToString("yyyy-MM-dd HH:mm:ss"), orderModel.Title, NumHelper.CentToDollarStr(orderModel.RealTotalPrice), orderModel.ID.ToString(), orderModel.OrderNo);
+        }
+
+        var head = "<tr style=\"text-align:center;\"><td>ID</td><td>订单号</td><td>用户名</td><td>商品名称</td><td>商品数量</td><td>总金额</td><td>实际金额</td><td>创建时间</td></tr>";
+        var bodyTemplate = "<tr style=\"text-align: center; COLOR: #0076C8; BACKGROUND-COLOR: #F4FAFF; font-weight: bold\"><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td><td>{7}</td></tr>";
+        var body = string.Format(bodyTemplate, orderModel.ID, orderModel.OrderNo, orderModel.UserName, orderModel.Title, orderModel.Count, NumHelper.CentToDollarStr(orderModel.OrderTotalPrice), NumHelper.CentToDollarStr(orderModel.RealTotalPrice), DateTime.Now);
+        var html = string.Format("<html><body><table style=\"width: 100%; border:solid 1px;\" cellpadding=\"1\" cellspacing=\"0\" border=\"1px\" >{0}{1}</table></body></html>", head, body);
+
+        List<string> emailAddress = new List<string>();
+        emailAddress.Add("287123885@qq.com");
+        emailAddress.Add("971413664@qq.com");
+        return MailHelper.sendMail("南洋大酒店订单", html, "wlj@sanda.com.cn", emailAddress, "smtp.sanda.com.cn", "wlj@sanda.com.cn", "Sanda123", true);
+    }
+
+    //发送订单信息(蛋糕)
+    public static bool SendEmail2(JieEn.Model.CakeOrder orderModel)
+    {
+        JieEn.BLL.User userBLL = new JieEn.BLL.User();
+        var userModel = userBLL.GetModel(orderModel.UserId);
+        if (userModel != null)
+        {
+            new TemplateMsg().BuySuccess2(userModel.OpenId, "尊敬的客户，您的订单已经成功支付", orderModel.PayTime.ToString("yyyy-MM-dd HH:mm:ss"), orderModel.Title, NumHelper.CentToDollarStr(orderModel.OrderTotalPrice), orderModel.ID.ToString(), orderModel.OrderNo);
+        }
+
+        List<string> openidList = new List<string>();
+        openidList.Add("osfT_tgPLlpnjl2n-1NzBKhtwqms");//婉如
+        openidList.Add("osfT_tvvYUPLPLYKyWaIfTviG7Tg");//珊珊
+        openidList.Add("osfT_tj7bpcp3MFrFVEBbZ4of850");//王凯
+        openidList.Add("osfT_tiXAdsDWqq8x558aQBsDES8");//小燕燕
+        openidList.Add("osfT_tkPBdr-Qg6PQiTgNAhZejgQ");//林蒋丽(Zoe)
+        openidList.Add("osfT_tv56W9zFn8hHamTf08QPGts");//顾珈维(林夕梦@顾顾)
+        openidList.Add("osfT_tpKofierRstv1j8mBf6KKGY");//小燕子穿花衣
+        openidList.Add("osfT_tjfA2COhqQKLYYD2iEn8Dus");//建建
+        openidList.Add("osfT_tnUsqlw0TyRww2qdOI5oKM0");//陶晋
+        foreach (var openid in openidList)
+        {
+            new TemplateMsg().BuySuccess_Admin2(openid, "【" + orderModel.UserName + " " + orderModel.Phone + "】的订单已经成功支付", orderModel.PayTime.ToString("yyyy-MM-dd HH:mm:ss"), orderModel.Title, NumHelper.CentToDollarStr(orderModel.OrderTotalPrice), orderModel.ID.ToString(), orderModel.OrderNo);
+        }
+
+        var head = "<tr style=\"text-align:center;\"><td>ID</td><td>订单号</td><td>用户名</td><td>商品名称</td><td>商品数量</td><td>总金额</td><td>创建时间</td></tr>";
+        var bodyTemplate = "<tr style=\"text-align: center; COLOR: #0076C8; BACKGROUND-COLOR: #F4FAFF; font-weight: bold\"><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td></tr>";
+        var body = string.Format(bodyTemplate, orderModel.ID, orderModel.OrderNo, orderModel.UserName, orderModel.Title, orderModel.Count, NumHelper.CentToDollarStr(orderModel.OrderTotalPrice), DateTime.Now);
+        var html = string.Format("<html><body><table style=\"width: 100%; border:solid 1px;\" cellpadding=\"1\" cellspacing=\"0\" border=\"1px\" >{0}{1}</table></body></html>", head, body);
+
+        List<string> emailAddress = new List<string>();
+        emailAddress.Add("287123885@qq.com");
+        emailAddress.Add("971413664@qq.com");
+        return MailHelper.sendMail("南洋大酒店订单", html, "wlj@sanda.com.cn", emailAddress, "smtp.sanda.com.cn", "wlj@sanda.com.cn", "Sanda123", true);
+    }
+
+    //发送订单信息(早餐券)
+    public static bool SendEmail3(JieEn.Model.MealCardOrder mcorderModel)
+    {
+        JieEn.BLL.User userBLL = new JieEn.BLL.User();
+        var userModel = userBLL.GetModel(mcorderModel.UserId);
+        if (userModel != null)
+        {
+            new TemplateMsg().BuySuccess3(userModel.OpenId, "尊敬的客户，您的订单已经成功支付", mcorderModel.PayTime.ToString("yyyy-MM-dd HH:mm:ss"), mcorderModel.Title, NumHelper.CentToDollarStr(mcorderModel.OrderTotalPrice), mcorderModel.ID.ToString(), mcorderModel.OrderNo);
+        }
+
+        List<string> openidList = new List<string>();
+        openidList.Add("osfT_tj7bpcp3MFrFVEBbZ4of850");//王凯
+        openidList.Add("osfT_tpKofierRstv1j8mBf6KKGY");//小燕子穿花衣
+        openidList.Add("osfT_tkN8QPPqjbSq-Pk0EvQuXmg");//庄
+        openidList.Add("osfT_tu01deZLFcQOp2idA-A-2ek");//宝宝娜
+        openidList.Add("osfT_trXVWMBbtM3ckDS10-56P64");//苹果肌
+        openidList.Add("osfT_tocRYGy2MggB-9M5pN7_VL4");//南洋大酒店～李加波
+        openidList.Add("osfT_thduYScAsJhp0jvfm60fv2A");//失忆
+        openidList.Add("osfT_ts9FBym3EICQs-fJP_clCA4");//小瑞
+        openidList.Add("osfT_toNo6sajbsu2bzAtxrTa9LM");//爱你荣！雨涵
+        openidList.Add("osfT_tiUOFnrFGf2nqXAmo42-caY");//素颜
+        openidList.Add("osfT_tnWSNTh2F0KtmOL_SvthkRA");//宝贝芮芮
+        //openidList.Add("");//jenny
+        openidList.Add("osfT_tjfA2COhqQKLYYD2iEn8Dus");//建建
+        foreach (var openid in openidList)
+        {
+            new TemplateMsg().BuySuccess_Admin3(openid, "【" + mcorderModel.RoomNo + " " + mcorderModel.Phone + "】的订单已经成功支付", mcorderModel.PayTime.ToString("yyyy-MM-dd HH:mm:ss"), mcorderModel.Title, NumHelper.CentToDollarStr(mcorderModel.OrderTotalPrice), mcorderModel.ID.ToString(), mcorderModel.OrderNo, mcorderModel.ID);
+        }
+
+        var head = "<tr style=\"text-align:center;\"><td>ID</td><td>订单号</td><td>用户名</td><td>商品名称</td><td>商品数量</td><td>总金额</td><td>创建时间</td></tr>";
+        var bodyTemplate = "<tr style=\"text-align: center; COLOR: #0076C8; BACKGROUND-COLOR: #F4FAFF; font-weight: bold\"><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td></tr>";
+        var body = string.Format(bodyTemplate, mcorderModel.ID, mcorderModel.OrderNo, mcorderModel.RoomNo, mcorderModel.Title, mcorderModel.Count, NumHelper.CentToDollarStr(mcorderModel.OrderTotalPrice), DateTime.Now);
+        var html = string.Format("<html><body><table style=\"width: 100%; border:solid 1px;\" cellpadding=\"1\" cellspacing=\"0\" border=\"1px\" >{0}{1}</table></body></html>", head, body);
+
+        List<string> emailAddress = new List<string>();
+        emailAddress.Add("287123885@qq.com");
+        emailAddress.Add("971413664@qq.com");
+        return MailHelper.sendMail("南洋大酒店订单", html, "wlj@sanda.com.cn", emailAddress, "smtp.sanda.com.cn", "wlj@sanda.com.cn", "Sanda123", true);
+    }
+
+    /**
+     * 生成12位数字串方法
+     */
+    public static string GenerateOutCode()
+    {
+        Random rd = new Random();
+        int num = rd.Next(100000, 999999);
+        int num2 = rd.Next(100000, 999999);
+        return num.ToString() + num2.ToString();
+    }
+}
