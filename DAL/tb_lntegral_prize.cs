@@ -46,20 +46,22 @@ namespace MZZ.DAL
 		{
 			StringBuilder strSql=new StringBuilder();
 			strSql.Append("insert into tb_lntegral_prize(");
-			strSql.Append("lntegral_prize_name,lntegral_prize_cost,lntegral_prize_status,lntegral_prize_img,lntegral_prize_batch)");
+			strSql.Append("lntegral_prize_name,lntegral_prize_cost,lntegral_prize_status,lntegral_prize_img,lntegral_prize_batch,lntegral_prize_num)");
 			strSql.Append(" values (");
-			strSql.Append("@lntegral_prize_name,@lntegral_prize_cost,@lntegral_prize_status,@lntegral_prize_img,@lntegral_prize_batch)");
+			strSql.Append("@lntegral_prize_name,@lntegral_prize_cost,@lntegral_prize_status,@lntegral_prize_img,@lntegral_prize_batch,@lntegral_prize_num)");
 			MySqlParameter[] parameters = {
 					new MySqlParameter("@lntegral_prize_name", MySqlDbType.VarChar,45),
 					new MySqlParameter("@lntegral_prize_cost", MySqlDbType.Int32,11),
 					new MySqlParameter("@lntegral_prize_status", MySqlDbType.VarChar,45),
 					new MySqlParameter("@lntegral_prize_img", MySqlDbType.VarChar,45),
-					new MySqlParameter("@lntegral_prize_batch", MySqlDbType.Int32,3)};
+					new MySqlParameter("@lntegral_prize_batch", MySqlDbType.Int32,3),
+					new MySqlParameter("@lntegral_prize_num", MySqlDbType.Int32,5)};
 			parameters[0].Value = model.lntegral_prize_name;
 			parameters[1].Value = model.lntegral_prize_cost;
 			parameters[2].Value = model.lntegral_prize_status;
 			parameters[3].Value = model.lntegral_prize_img;
 			parameters[4].Value = model.lntegral_prize_batch;
+			parameters[5].Value = model.lntegral_prize_num;
 
 			int rows=DbHelperMySQL.ExecuteSql(strSql.ToString(),parameters);
 			if (rows > 0)
@@ -82,7 +84,8 @@ namespace MZZ.DAL
 			strSql.Append("lntegral_prize_cost=@lntegral_prize_cost,");
 			strSql.Append("lntegral_prize_status=@lntegral_prize_status,");
 			strSql.Append("lntegral_prize_img=@lntegral_prize_img,");
-			strSql.Append("lntegral_prize_batch=@lntegral_prize_batch");
+			strSql.Append("lntegral_prize_batch=@lntegral_prize_batch,");
+			strSql.Append("lntegral_prize_num=@lntegral_prize_num");
 			strSql.Append(" where lntegral_prize_id=@lntegral_prize_id");
 			MySqlParameter[] parameters = {
 					new MySqlParameter("@lntegral_prize_name", MySqlDbType.VarChar,45),
@@ -90,13 +93,15 @@ namespace MZZ.DAL
 					new MySqlParameter("@lntegral_prize_status", MySqlDbType.VarChar,45),
 					new MySqlParameter("@lntegral_prize_img", MySqlDbType.VarChar,45),
 					new MySqlParameter("@lntegral_prize_batch", MySqlDbType.Int32,3),
+					new MySqlParameter("@lntegral_prize_num", MySqlDbType.Int32,5),
 					new MySqlParameter("@lntegral_prize_id", MySqlDbType.Int32,11)};
 			parameters[0].Value = model.lntegral_prize_name;
 			parameters[1].Value = model.lntegral_prize_cost;
 			parameters[2].Value = model.lntegral_prize_status;
 			parameters[3].Value = model.lntegral_prize_img;
 			parameters[4].Value = model.lntegral_prize_batch;
-			parameters[5].Value = model.lntegral_prize_id;
+			parameters[5].Value = model.lntegral_prize_num;
+			parameters[6].Value = model.lntegral_prize_id;
 
 			int rows=DbHelperMySQL.ExecuteSql(strSql.ToString(),parameters);
 			if (rows > 0)
@@ -160,7 +165,7 @@ namespace MZZ.DAL
 		{
 			
 			StringBuilder strSql=new StringBuilder();
-			strSql.Append("select lntegral_prize_id,lntegral_prize_name,lntegral_prize_cost,lntegral_prize_status,lntegral_prize_img,lntegral_prize_batch from tb_lntegral_prize ");
+			strSql.Append("select lntegral_prize_id,lntegral_prize_name,lntegral_prize_cost,lntegral_prize_status,lntegral_prize_img,lntegral_prize_batch,lntegral_prize_num from tb_lntegral_prize ");
 			strSql.Append(" where lntegral_prize_id=@lntegral_prize_id");
 			MySqlParameter[] parameters = {
 					new MySqlParameter("@lntegral_prize_id", MySqlDbType.Int32)
@@ -212,6 +217,10 @@ namespace MZZ.DAL
 				{
 					model.lntegral_prize_batch=int.Parse(row["lntegral_prize_batch"].ToString());
 				}
+				if(row["lntegral_prize_num"]!=null && row["lntegral_prize_num"].ToString()!="")
+				{
+					model.lntegral_prize_num=int.Parse(row["lntegral_prize_num"].ToString());
+				}
 			}
 			return model;
 		}
@@ -222,7 +231,7 @@ namespace MZZ.DAL
 		public DataSet GetList(string strWhere)
 		{
 			StringBuilder strSql=new StringBuilder();
-			strSql.Append("select lntegral_prize_id,lntegral_prize_name,lntegral_prize_cost,lntegral_prize_status,lntegral_prize_img,lntegral_prize_batch ");
+			strSql.Append("select lntegral_prize_id,lntegral_prize_name,lntegral_prize_cost,lntegral_prize_status,lntegral_prize_img,lntegral_prize_batch,lntegral_prize_num ");
 			strSql.Append(" FROM tb_lntegral_prize ");
 			if(strWhere.Trim()!="")
 			{

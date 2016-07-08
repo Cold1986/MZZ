@@ -29,11 +29,15 @@
                 
                 <asp:Image ID="Image1" runat="server" />
                 <i runat="server" id="i1"></i>
+                <br />
+                <i runat="server" id="i1n" style="color:gray"></i>
                 <span class="getGift">兑换</span>
             </div>
             <div class="get-gift right-top">
                 <asp:Image ID="Image3"  runat="server" />
                 <i runat="server" id="i3"></i>
+                <br />
+                <i runat="server" id="i3n" style="color:gray"></i>
                 <span class="getGift">兑换</span>
             </div>
         </div>
@@ -41,17 +45,23 @@
             <div class="get-gift left-bottom">
                 <asp:Image ID="Image2"  runat="server" />
                 <i runat="server" id="i2"></i>
+                <br />
+                <i runat="server" id="i2n" style="color:gray"></i>
                 <span class="getGift">兑换</span>
             </div>
             <div class="get-gift right-bottom">
                 <asp:Image ID="Image4"  runat="server" />
                 <i runat="server" id="i4"></i>
+                <br />
+                <i runat="server" id="i4n" style="color:gray"></i>
                 <span class="getGift">兑换</span>
             </div>
         </div>
         <div class="get-gift center">
             <asp:Image ID="Image0" runat="server" />
             <i runat="server" id="i0"></i>
+            <br />
+            <i runat="server" id="i0n" style="color:gray"></i>
             <span class="getGift">兑换</span>
         </div>
     </div>

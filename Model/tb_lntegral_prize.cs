@@ -16,6 +16,7 @@ namespace MZZ.Model
 		private string _lntegral_prize_status;
 		private string _lntegral_prize_img;
 		private int? _lntegral_prize_batch;
+		private int? _lntegral_prize_num=0;
 		/// <summary>
 		/// auto_increment
 		/// </summary>
@@ -63,6 +64,14 @@ namespace MZZ.Model
 		{
 			set{ _lntegral_prize_batch=value;}
 			get{return _lntegral_prize_batch;}
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		public int? lntegral_prize_num
+		{
+			set{ _lntegral_prize_num=value;}
+			get{return _lntegral_prize_num;}
 		}
 		#endregion Model
 

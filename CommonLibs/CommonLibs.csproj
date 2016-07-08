@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\CacheHelper.cs" />
+    <Compile Include="Convert\ConvertHelper.cs" />
+    <Compile Include="Dictionary\DictionaryHelper.cs" />
     <Compile Include="Log\LogHandler.cs" />
     <Compile Include="Log\LogHelper.cs" />
     <Compile Include="Session\SessionHelper.cs" />

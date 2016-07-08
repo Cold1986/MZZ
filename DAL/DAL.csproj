@@ -146,6 +146,7 @@
     <Compile Include="tb_imgs.cs" />
     <Compile Include="tb_lntegral_prize.cs" />
     <Compile Include="tb_lntegral_users.cs" />
+    <Compile Include="tb_lntegral_users_ExtensionMethod.cs" />
     <Compile Include="tb_log.cs" />
     <Compile Include="tb_news.cs" />
     <Compile Include="tb_prizes.cs" />
