@@ -108,7 +108,21 @@
             },
             cache:false,
             success: function (result) {
-                    alert("分享成功");
+
+
+                var data = $.parseJSON(result);
+                if (data.errcode == 0) {
+                    alert("分享成功,获取30积分");
+                    var integral = document.getElementById("Hidintegral").innerText * 1;
+                    integral = integral + 30;
+                    document.getElementById("Hidintegral").innerText = integral;
+
+                } else {
+                    alert("分享成功,每天只能获取一次积分哦");
+
+                }
+
+
 
             }
         });

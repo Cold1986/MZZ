@@ -83,22 +83,29 @@ public class LntegralHandler : IHttpHandler, IRequiresSessionState {
     {
         try
         {
-                DateTime nowDate = DateTime.Now;
+            DateTime nowDate = DateTime.Now;
             string openid = context.Request["openid"];
             DataSet ds = DbHelperMySQL.Query("select * from tb_signin where openid='"+openid+"' and year(createdtime)="+nowDate.Year.ToString()+" and month(createdtime)="+nowDate.Month.ToString()+" and day(createdtime)="+nowDate.Day.ToString()+" and type='share'");
             DataTable tb = ds.Tables[0];
-            if (tb.Rows.Count == 0) {
-DbHelperMySQL.ExecuteSql("update tb_user set user_integral=user_integral+30  where user_phone='"+openid +"'");
-DbHelperMySQL.ExecuteSql("INSERT INTO tb_signin(openid, type,createdtime) VALUES('"+openid+"','share',current_timestamp)");
+            if (tb.Rows.Count == 0)
+            {
+                DbHelperMySQL.ExecuteSql("update tb_user set user_integral=user_integral+30  where user_phone='" + openid + "'");
+                DbHelperMySQL.ExecuteSql("INSERT INTO tb_signin(openid, type,createdtime) VALUES('" + openid + "','share',current_timestamp)");
+                RetCode.errcode = 0;
+                RetCode.errmsg = "ok";
+            }
+            else {
+                RetCode.errcode = 1;
+                RetCode.errmsg = "done";
+
             }
 
 
-            
 
-            
 
-            RetCode.errcode = 0;
-            RetCode.errmsg = "ok";
+
+
+
             return WeiXinSDK.Util.ToJson(RetCode);
         }
         catch (Exception ex)
