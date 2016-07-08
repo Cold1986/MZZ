@@ -60,7 +60,7 @@ public partial class Integral : AbstractPage
         this.i0.Attributes.Add("prizeID", Convert.ToString(tb.Rows[4]["lntegral_prize_id"]));
 
         newsPic = "http://" + Request.Url.Host + "/images/mengmeizi.jpg";
-        shareurl = "http://" + Request.Url.Host + "/Lntegral.aspx";
+        shareurl = "http://" + Request.Url.Host + "/Integral.aspx";
 
 
 

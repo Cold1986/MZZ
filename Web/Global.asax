@@ -15,14 +15,14 @@
         //}
         //oReg = null;
 
-        string oldUrl = HttpContext.Current.Request.RawUrl;
-        string pattern = @"/([^/]+?).html$";
-        string replace = "/default.aspx?q=$1";
-        if (Regex.IsMatch(oldUrl, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled))
-        {
-            string newUrl = Regex.Replace(oldUrl, pattern, replace, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            this.Context.RewritePath(newUrl);
-        }
+        //string oldUrl = HttpContext.Current.Request.RawUrl;
+        //string pattern = @"/([^/]+?).html$";
+        //string replace = "/default.aspx?q=$1";
+        //if (Regex.IsMatch(oldUrl, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled))
+        //{
+        //    string newUrl = Regex.Replace(oldUrl, pattern, replace, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        //    this.Context.RewritePath(newUrl);
+        //}
     }
     
     void Application_Start(object sender, EventArgs e) 
