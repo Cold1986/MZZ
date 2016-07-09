@@ -277,7 +277,7 @@
             $(function () {
                 $(".get-gift").each(function () {
                     var num = $(this).children("i")[1].innerText * 1;
-                    if (num <= 1) {
+                    if (num <= 0) {
                         $(this).children("i")[1].innerText = "已换完";
                         $(this).unbind("click");//取消click绑定
                         $(this).on("click", function () {

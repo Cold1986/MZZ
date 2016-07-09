@@ -18,23 +18,23 @@ public partial class Integral : AbstractPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        //UserInfo userinfo = UserInfoRule.CheckLogin();
-        //if (userinfo == null || userinfo.TableName != EnumLoginType.User)
-        //{
-        //    Response.Redirect("Oauth.aspx?url=" + Server.UrlEncode(Request.Url.ToString()));
-        //    return;
-        //}
-        //code = Request.QueryString["code"];
-        //MZZ.Model.tb_user userModel = userinfo.Entity as MZZ.Model.tb_user;
-        //openid = userModel.user_openid;
-        //hidopenid.Value = openid;
+        UserInfo userinfo = UserInfoRule.CheckLogin();
+        if (userinfo == null || userinfo.TableName != EnumLoginType.User)
+        {
+            Response.Redirect("Oauth.aspx?url=" + Server.UrlEncode(Request.Url.ToString()));
+            return;
+        }
+        code = Request.QueryString["code"];
+        MZZ.Model.tb_user userModel = userinfo.Entity as MZZ.Model.tb_user;
+        openid = userModel.user_openid;
+        hidopenid.Value = openid;
 
-        //var dt = UserInfoRule.GetUserInfo(openid); 
+        var dt = UserInfoRule.GetUserInfo(openid);
 
-        //if (dt.Count > 0) //用户已存在
-        //{
-        //    Hidintegral.InnerText = dt[0].user_integral.ToString();
-        //}
+        if (dt.Count > 0) //用户已存在
+        {
+            Hidintegral.InnerText = dt[0].user_integral.ToString();
+        }
 
         newsPic = "http://" + Request.Url.Host + "/images/mengmeizi.jpg";
         shareurl = "http://" + Request.Url.Host + "/Integral.aspx";
@@ -67,22 +67,25 @@ public partial class Integral : AbstractPage
         this.i0n.InnerText = IntegralPrizeRule.GetRemainderNum(Convert.ToString(tb.Rows[4]["lntegral_prize_id"]), Convert.ToString(tb.Rows[4]["lntegral_prize_num"]));
         #endregion
 
-        MZZ.BLL.tb_lntegral_users bllIntegralUser = new MZZ.BLL.tb_lntegral_users();
-        DataSet ds = bllIntegralUser.GetList("openid='" + openid + "' order by createdate desc");
-        //DataSet ds = DbHelperMySQL.Query("SELECT * FROM tb_lntegral_users where openid='" + openid + "' order by createdate desc");
-        tb = ds.Tables[0];
-        if (tb.Rows.Count > 0)
-        {
-            inputaddress.Text = Convert.ToString(tb.Rows[0]["address"]);
-            inputname.Text = Convert.ToString(tb.Rows[0]["name"]);
-            inputphone.Text = Convert.ToString(tb.Rows[0]["cellphone"]);
-        }
 
-        ds = DbHelperMySQL.Query("SELECT 1 FROM tb_lntegral_users left join tb_lntegral_prize on tb_lntegral_prize.lntegral_prize_id=tb_lntegral_users.prizeid where tb_lntegral_prize.lntegral_prize_status='1' and tb_lntegral_users.openid='" + openid + "'");
+
+        DataSet ds = DbHelperMySQL.Query("SELECT 1 FROM tb_lntegral_users left join tb_lntegral_prize on tb_lntegral_prize.lntegral_prize_id=tb_lntegral_users.prizeid where tb_lntegral_prize.lntegral_prize_status='1' and tb_lntegral_users.openid='" + openid + "'");
         tb = ds.Tables[0];
-        if (tb.Rows.Count > 0)
+        if (tb.Rows.Count > 0)//本次活动已经兑换过
         {
             HidStatus.Value = "1";
+        }
+        else
+        {
+            MZZ.BLL.tb_lntegral_users bllIntegralUser = new MZZ.BLL.tb_lntegral_users();
+            ds = bllIntegralUser.GetList("openid='" + openid + "' order by createdate desc");
+            tb = ds.Tables[0];
+            if (tb.Rows.Count > 0)
+            {
+                inputaddress.Text = Convert.ToString(tb.Rows[0]["address"]);
+                inputname.Text = Convert.ToString(tb.Rows[0]["name"]);
+                inputphone.Text = Convert.ToString(tb.Rows[0]["cellphone"]);
+            }
         }
 
     }
