@@ -11,6 +11,8 @@ namespace ServiceBiz
 {
     public class UserInfoRule
     {
+        private static MZZ.BLL.tb_user usersBLL = new MZZ.BLL.tb_user();
+
         public static UserInfo CheckLogin()
         {
             try
@@ -26,7 +28,7 @@ namespace ServiceBiz
                     {
                         case EnumLoginType.User:
                             MZZ.Model.tb_user usersEntity = userInfo.Entity as MZZ.Model.tb_user;
-                            MZZ.BLL.tb_user usersBLL = new MZZ.BLL.tb_user();
+                            usersBLL = new MZZ.BLL.tb_user();
                             MZZ.Model.tb_user usersModel = usersBLL.GetModel(usersEntity.user_id);
                             if (usersModel.user_id == usersEntity.user_id)
                             {
@@ -64,7 +66,22 @@ namespace ServiceBiz
         /// <returns></returns>
         public static List<MZZ.Model.tb_user> GetUserInfo(string user_openid)
         {
-            return null;
+            List<MZZ.Model.tb_user> list = new List<MZZ.Model.tb_user>();
+
+            var res = CacheHelper.GetCache("UserInfo" + user_openid);
+            if (res != null)
+            {
+                list = (List<MZZ.Model.tb_user>)res;
+            }
+            else
+            {
+                list = usersBLL.GetModelList("user_openid = '" + user_openid + "'");
+                if (list.Any())
+                {
+                    CacheHelper.SetCache("UserInfo" + user_openid, list, new TimeSpan(0, 0, 30, 0));
+                }
+            }
+            return list;
         }
     }
 }

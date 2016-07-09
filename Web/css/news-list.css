@@ -1,0 +1,49 @@
+html,body {
+	width: 100%; 
+	height: 100%;
+}
+.wrap {
+	background: #f3f3f3;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+/* 分类 */
+.catalog {
+	position: fixed;
+	bottom: 0;
+	border-top: 1px solid #ccc;
+	border-bottom: none;
+}
+.news-list {
+	position: relative;
+	width: 100%;
+	height: calc( 100% - 7.3em );
+}
+.news-list ul {
+}
+.news-list ul li {
+	border-bottom: 1px solid #ccc;
+	background: transparent;
+	padding: 0.7em 0.5em;
+	height: auto;
+}
+.news-list ul li a {
+	display: block;
+}
+.news-list ul li span {
+	display: block;
+	width: 5em;
+	height: 5em;
+	float: left;
+	background: url(../img/test.jpg);
+	background-size: 100% 100%;
+
+}
+.news-list ul li p {
+	width: calc( 96% - 5em );
+	float: right;
+	text-align: left;
+	line-height: 1.5em;
+}

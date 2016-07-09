@@ -2017,7 +2017,7 @@ a{
   cursor:pointer;
 }
 a:hover{text-decoration: none; outline:0; }
-a:visited{ color: #00e;}
+a:visited{ color: #333;}
 
 fieldset, img { border: 0; }
 
@@ -2114,4 +2114,20 @@ img { vertical-align: bottom; }
 	display: block;
 	font-size: 1.5em;
 	height: 1.3em;
+}
+.catalog {
+  font-size: 1em;
+  height: auto;
+}
+
+.hot {
+  color: #ff2941 !important;
+}
+.hot-bg {
+  color: #fff !important;
+  background: #ff2941 !important;
+}
+
+.weui_btn_dialog.primary {
+  color: #ff2941;
 }

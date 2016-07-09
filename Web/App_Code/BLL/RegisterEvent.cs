@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Maticsoft.DBUtility;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using WeiXinSDK.Message;
@@ -12,8 +14,8 @@ public class RegisterEvent
     public RegisterEvent()
     {
         //点击菜单拉取消息时的事件推送
-        //WeiXinSDK.MyFunc<EventClickMsg, ReplyBaseMsg> clickhandler = ClickHandler;
-        //WeiXinSDK.WeiXin.RegisterEventHandler<EventClickMsg>(clickhandler);
+        WeiXinSDK.MyFunc<EventClickMsg, ReplyBaseMsg> clickhandler = ClickHandler;
+        WeiXinSDK.WeiXin.RegisterEventHandler<EventClickMsg>(clickhandler);
 
         //用户未关注时，扫描二维码进行关注后的事件推送
         WeiXinSDK.MyFunc<EventUserScanMsg, ReplyBaseMsg> scanhandler = ScanHandler;
@@ -66,53 +68,75 @@ public class RegisterEvent
     /// <summary>
     /// 点击菜单拉取消息时的事件推送 
     /// </summary>
-    //public ReplyBaseMsg ClickHandler(EventClickMsg msg)
-    //{
-    //    JieEn.BLL.WxMenu menuBLL = new JieEn.BLL.WxMenu();
-    //    JieEn.Model.WxMenu menuModel = menuBLL.GetModelList("MenuType='Click' And MenuKeyOrUrl='" + msg.EventKey + "'").FirstOrDefault();
-    //    if (menuModel == null)
-    //    {
-    //        return ReplyEmptyMsg.Instance;
-    //    }
-    //    else
-    //    {
-    //        try
-    //        {
-    //            ReplyTextMsg replymsg = new ReplyTextMsg();
+    public ReplyBaseMsg ClickHandler(EventClickMsg msg)
+    {
 
-    //            switch (msg.EventKey)
-    //            {
-    //                case "就餐预订":
-    //                    replymsg.Content = "订餐热线：05808227777";
-    //                    return replymsg;
-    //                case "活动介绍":
-    //                    replymsg.Content = "暂无优惠活动，敬请关注最新公众号通知。";
-    //                    return replymsg;
-    //                case "领取优惠券":
-    //                    //JieEn.BLL.User userBLL = new JieEn.BLL.User();
-    //                    //var userModel = userBLL.GetModel(msg.FromUserName);
-    //                    //SendCard sendCard = new SendCard();
-    //                    //if (userModel != null && sendCard.SendFirstCard(userModel.ID))
-    //                    //{
-    //                    //    replymsg.Content = "领取成功，<a href='http://wx.zsnanyang.com/ticket.aspx'>点击查看</a>";
-    //                    //}
-    //                    //else
-    //                    //{
-    //                    //    replymsg.Content = sendCard.ErrMsg == "" ? "领取失败。" : sendCard.ErrMsg;
-    //                    //}
-    //                    //return replymsg;
-    //                default:
-    //                    ReplyNewsMsg rNewsMsg = WeiXinSDK.Util.JsonTo<ReplyNewsMsg>(menuModel.Menu_xml);
-    //                    return rNewsMsg;
-    //            }
-    //        }
-    //        catch
-    //        {
-    //            return ReplyEmptyMsg.Instance;
-    //        }
-    //    }
-    //}
+        CHelper.WriteLog("msg", msg.EventKey);
+        if (msg.EventKey == "checkin")
+        {
+            ReplyTextMsg replymsg = new ReplyTextMsg();
+            DateTime nowDate = DateTime.Now;
+            string openid = msg.FromUserName;
+            DataSet ds = DbHelperMySQL.Query("select * from tb_signin where openid='" + openid + "' and year(createdtime)=" + nowDate.Year.ToString() + " and month(createdtime)=" + nowDate.Month.ToString() + " and day(createdtime)=" + nowDate.Day.ToString() + " and type='checkin'");
+            DataTable tb = ds.Tables[0];
+            if (tb.Rows.Count == 0)
+            {
+                DbHelperMySQL.ExecuteSql("update tb_user set user_integral=user_integral+5  where user_phone='" + openid + "'");
+                DbHelperMySQL.ExecuteSql("INSERT INTO tb_signin(openid, type,createdtime) VALUES('" + openid + "','checkin',current_timestamp)");
+                replymsg.Content = "签到成功，谢谢";
+            }
+            else
+            {
 
+                replymsg.Content = "您今天已经签到过了，请明天再来。";
+
+            }
+            return replymsg;
+        }
+        //JieEn.BLL.WxMenu menuBLL = new JieEn.BLL.WxMenu();
+        //JieEn.Model.WxMenu menuModel = menuBLL.GetModelList("MenuType='Click' And MenuKeyOrUrl='" + msg.EventKey + "'").FirstOrDefault();
+        //if (menuModel == null)
+        //{
+        //    return ReplyEmptyMsg.Instance;
+        //}
+        //else
+        //{
+        //    try
+        //    {
+        //ReplyTextMsg replymsg = new ReplyTextMsg();
+
+        //switch (msg.EventKey)
+        //{
+        //    //case "就餐预订":
+        //    //    replymsg.Content = "订餐热线：05808227777";
+        //    //    return replymsg;
+        //    //case "活动介绍":
+        //    //    replymsg.Content = "暂无优惠活动，敬请关注最新公众号通知。";
+        //    //    return replymsg;
+        //    //case "领取优惠券":
+        //    ////JieEn.BLL.User userBLL = new JieEn.BLL.User();
+        //    ////var userModel = userBLL.GetModel(msg.FromUserName);
+        //    ////SendCard sendCard = new SendCard();
+        //    ////if (userModel != null && sendCard.SendFirstCard(userModel.ID))
+        //    ////{
+        //    ////    replymsg.Content = "领取成功，<a href='http://wx.zsnanyang.com/ticket.aspx'>点击查看</a>";
+        //    ////}
+        //    ////else
+        //    ////{
+        //    ////    replymsg.Content = sendCard.ErrMsg == "" ? "领取失败。" : sendCard.ErrMsg;
+        //    ////}
+        //    ////return replymsg;
+        //    //default:
+        //    //    ReplyNewsMsg rNewsMsg = WeiXinSDK.Util.JsonTo<ReplyNewsMsg>(menuModel.Menu_xml);
+        //    //    return rNewsMsg;
+        //}
+        //}
+        //catch
+        //{
+        return ReplyEmptyMsg.Instance;
+        //}
+        //}
+    }
     /// <summary>
     /// 用户未关注时，扫描二维码进行关注后的事件推送
     /// 1.带参数二维码

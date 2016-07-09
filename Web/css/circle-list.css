@@ -10,7 +10,7 @@ html,body {
 	overflow: hidden;
 }
 .circle-list #wrapper {
-	height: calc( 100% - 4.6em );
+	height: calc( 100% - 2.4em );
 }
 .panel {
 	position: fixed;
@@ -28,11 +28,16 @@ html,body {
 }
 .panel a span i {
 	font-size: 1.2em;
+	margin-right: 0.2em;
+	vertical-align: -2px;	
 }
 .panel  a span .ion-android-star {
 	font-size: 1.4em;
+	vertical-align: -1px;	
 }
-.panel .hot-bg {
+.panel .hot {
+	color: #fff;
+	background: #ff2941;
 	border-radius: 3px;
 }
 .list-item {

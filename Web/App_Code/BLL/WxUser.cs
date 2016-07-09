@@ -99,7 +99,7 @@ public class WxUser
 
             if (userinfo.subscribe == 1)
             {
-                usersModel.user_nick_name = WebHelp.GB2312ToUTF8(userinfo.nickname);
+                usersModel.user_nick_name = HttpUtility.UrlEncode(userinfo.nickname, System.Text.Encoding.UTF8);
                 usersModel.user_head_img_url = WebHelp.GB2312ToUTF8(userinfo.headimgurl);
                 usersModel.user_sub_time = CHelper.UnixTimeToTime(userinfo.subscribe_time);
                 usersModel.user_qr_code = ticket.ticket;
@@ -156,15 +156,16 @@ public class WxUser
 
             if (userinfo2.subscribe == 1)
             {
+                
                 usersModel.user_sub_scribe = true;
-                usersModel.user_nick_name = WebHelp.GB2312ToUTF8(userinfo2.nickname);
+                usersModel.user_nick_name = HttpUtility.UrlEncode(userinfo2.nickname, System.Text.Encoding.UTF8);
                 usersModel.user_head_img_url = userinfo2.headimgurl;
                 usersModel.user_sub_time = Convert.ToDateTime(DateTime.Now);
             }
             else
             {
                 usersModel.user_sub_scribe = false;
-                usersModel.user_nick_name = WebHelp.GB2312ToUTF8(userinfo.nickname);
+                usersModel.user_nick_name = HttpUtility.UrlEncode(userinfo.nickname, System.Text.Encoding.UTF8);
                 usersModel.user_head_img_url = userinfo.headimgurl;
                 usersModel.user_qr_code = ticket.ticket;
                 usersModel.user_sub_time = Convert.ToDateTime(DateTime.Now);

@@ -29,8 +29,7 @@ public partial class Integral : AbstractPage
         //openid = userModel.user_openid;
         //hidopenid.Value = openid;
 
-        //MZZ.BLL.tb_user blluser = new MZZ.BLL.tb_user();
-        //var dt = blluser.GetModelList("user_openid = '" + openid + "'");
+        //var dt = UserInfoRule.GetUserInfo(openid); 
 
         //if (dt.Count > 0) //用户已存在
         //{
@@ -40,6 +39,7 @@ public partial class Integral : AbstractPage
         newsPic = "http://" + Request.Url.Host + "/images/mengmeizi.jpg";
         shareurl = "http://" + Request.Url.Host + "/Integral.aspx";
 
+        #region 奖品信息部分
         DataTable tb = IntegralPrizeRule.GetPirzeDataTableByBatch(1);
         this.Image1.ImageUrl = Convert.ToString(tb.Rows[0]["lntegral_prize_img"]);
         this.i1.InnerText = Convert.ToString(tb.Rows[0]["lntegral_prize_cost"]) + "P";
@@ -65,10 +65,11 @@ public partial class Integral : AbstractPage
         this.i0.InnerText = Convert.ToString(tb.Rows[4]["lntegral_prize_cost"]) + "P";
         this.i0.Attributes.Add("prizeID", Convert.ToString(tb.Rows[4]["lntegral_prize_id"]));
         this.i0n.InnerText = IntegralPrizeRule.GetRemainderNum(Convert.ToString(tb.Rows[4]["lntegral_prize_id"]), Convert.ToString(tb.Rows[4]["lntegral_prize_num"]));
+        #endregion
 
-
-
-        DataSet ds = DbHelperMySQL.Query("SELECT * FROM tb_lntegral_users where openid='" + openid + "' order by createdate desc");
+        MZZ.BLL.tb_lntegral_users bllIntegralUser = new MZZ.BLL.tb_lntegral_users();
+        DataSet ds = bllIntegralUser.GetList("openid='" + openid + "' order by createdate desc");
+        //DataSet ds = DbHelperMySQL.Query("SELECT * FROM tb_lntegral_users where openid='" + openid + "' order by createdate desc");
         tb = ds.Tables[0];
         if (tb.Rows.Count > 0)
         {
@@ -77,7 +78,7 @@ public partial class Integral : AbstractPage
             inputphone.Text = Convert.ToString(tb.Rows[0]["cellphone"]);
         }
 
-        ds = DbHelperMySQL.Query("SELECT * FROM tb_lntegral_users left join tb_lntegral_prize on tb_lntegral_prize.lntegral_prize_id=tb_lntegral_users.prizeid where tb_lntegral_prize.lntegral_prize_status='1' and tb_lntegral_users.openid='" + openid + "'");
+        ds = DbHelperMySQL.Query("SELECT 1 FROM tb_lntegral_users left join tb_lntegral_prize on tb_lntegral_prize.lntegral_prize_id=tb_lntegral_users.prizeid where tb_lntegral_prize.lntegral_prize_status='1' and tb_lntegral_users.openid='" + openid + "'");
         tb = ds.Tables[0];
         if (tb.Rows.Count > 0)
         {

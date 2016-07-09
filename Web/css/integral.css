@@ -1,0 +1,164 @@
+@charset "utf-8";
+/* CSS Document */
+body,html {
+	width: 100%;
+}
+.wrap {
+	width: 100%; 
+	}
+.banner {
+	margin-bottom: 1em;
+	width: 100%;
+}
+.banner img {
+	width: 100%;
+}
+.notice {
+	font-size: 1em; 
+	line-height: 1.5em;
+	padding: 1.5em 1.5em 2em;
+	background: url(../img/bg-left.jpg) no-repeat left top;
+	background-size: auto 50%;
+	position: relative;
+	margin-bottom: 0.2em;
+	font-size: 0.9em;
+}
+.notice h3 {
+	margin-bottom: 0.5em;
+}
+.notice-bg {
+	background: url(../img/bg-right.jpg) no-repeat right bottom;
+	background-size: auto 50%;
+	position: absolute;
+	width: 100%; 
+	height: 100%;
+	left: 0;
+	top: 0;
+	z-index: -1;
+}
+.integral p {
+	color: #666;
+	padding: 0 1em;
+	font-size: 0.8em;
+}
+.integral p span, .integral p a {
+	font-weight: bold;
+	color: #f74971;
+}
+.list {
+	padding: 2em 0;
+	position: relative;
+}
+.list div img {
+	width: 100%;
+}
+.list div div {
+	width: 32%;	
+	margin-bottom: 2em;
+	text-align: center;
+}
+.list div div i, .list .center i {
+	font-style: normal;
+	font-weight: bold;
+}
+.list .left-top {
+	float: left;
+}
+.list .left-bottom {
+	float: left;
+}
+.list .right-top {
+	float: right;
+}
+.list .right-bottom {
+	float: right;
+}
+.list .center {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	width: 40%;
+	text-align: center;
+}
+.list .center img {
+	border-radius: 50%;
+}
+.list .getGift {
+	display: block;
+	width: 4em;
+	height: 4em;
+	background: url(../img/btn.png) no-repeat center center;
+	background-size: 100%;
+	text-indent: -100%;
+	overflow: hidden;
+	margin: 0 auto;
+}
+
+.popup {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	background: rgba(0,0,0,0.7);
+	padding: 2em;
+	color: #fff;
+	display: none;
+	z-index: 999;
+}
+.popup span.close {
+	position: absolute;
+	right: 0.2em;
+	top: 0.2em;
+	font-size: 2em;
+	line-height: 1em;
+	display: block;
+	width: 1em;
+	height: 1em;
+	text-align: center;
+	color: #ddd;
+	font-family: Verdana, Geneva, sans-serif;
+}
+.popup a {
+	display: block;
+	margin: 0.5em auto;
+	width: 5em;
+	text-align: center;
+	padding: 0.5em 1em;
+	background: #ed8aad;
+	color: #fff;
+	border-radius: 0.5em;
+	font-weight: bold;
+}
+.address, .confirm {
+	width: 80%;
+	padding: 3em 2em 1.5em;
+}
+.address p {
+	margin-bottom: 1.2em;
+}
+.confirm p {
+	line-height: 1.5em;
+	margin-bottom: 1.2em;
+}
+.address label {
+	display: inline-block;
+	width: 5em;
+	text-align: right;
+	margin-right: 0.5em;
+}
+.address input[type="text"] {
+	border: none;
+	padding: 0.5em;
+	width: calc( 90% - 6em );
+}
+.gray {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	background: rgba(0,0,0,0.5);
+	display: none;
+	z-index: 2;
+}

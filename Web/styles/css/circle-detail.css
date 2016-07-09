@@ -1,0 +1,32 @@
+html,body,.wrap {
+	overflow: auto;
+}
+.catalog {
+	background: #f3f3f3;
+	font-size: 1em;
+	padding: 0.5em 0;
+}
+.catalog a {
+	border: none;
+	width: 20%;
+	color: #999;
+	text-align: left;
+	padding: 0 0.5em;
+}
+.comment-list {
+	background: #fff;
+	margin-bottom: 4em;
+}
+.comment-list > h3 {
+	border-bottom: 1px solid #ccc;
+	line-height: 2em;
+	color: #666;
+	padding: 0 0.5em;
+}
+.comment-list > ul > li {
+	border-bottom: 1px solid #ccc;
+	padding: 0.5em;
+}
+.comment-content {
+	padding-top: 0.5em;
+}

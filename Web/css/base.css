@@ -1,0 +1,121 @@
+@charset "utf-8";
+
+/*通用声明*/
+
+/*使用弹性*/
+html {font-size: 100%; }
+body {font-size: 1em; overflow-x:hidden; }
+
+body,footer,header, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, form, fieldset, legend, button, input, textarea, th, td{
+    margin: 0;
+    padding: 0;
+	text-align:left;
+	-webkit-text-size-adjust: none;/*让谷歌浏览器允许使用超小字体*/
+	font-family: "微软雅黑";
+}
+
+body,button, input, select, textarea, ol{ font: 1em \5FAE\8F6F\96C5\9ED1,\5b8b\4f53,tahoma, sans-serif; color:#000; text-align:left; }
+
+body{ background-color: #FFF; background-attachment:fixed; }
+ul, ol { list-style: none; }
+
+a{
+	text-decoration:none; 
+	transition:all 0.5s;
+	-moz-transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	cursor:pointer;
+}
+a:hover{text-decoration: none; outline:0; }
+a:visited{ color: #000;}
+
+fieldset, img { border: 0; }
+
+.right{ float:right; }
+.left{ float:left; }
+
+.clear{clear:both;}
+.clear_float:after {  content: ".";  display: block;  height: 0;  clear: both;  visibility:hidden; } 
+.clear_float {  zoom:1;/*对于不支持伪类的浏览器兼容*/ } 
+
+.abs{ position:absolute; }
+
+.text_overflow{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; word-break:keep-all; display:block; }
+.text_left{ text-align:left; }
+.text_right{ text-align:right; }
+.text_center{ text-align:center; }
+
+/*通用声明结束*/
+
+.fl { float: left; }
+.w14 { width: 14%; }
+.w15 { width: 15%; }
+.w18 { width: 18%; }.w19 { width: 19%; }.w20 { width: 20%; }.w21 { width: 21%; }.w22 { width: 22%; }
+.w71 { width: 71%; }
+.w50 { width: 50%; }
+.w86 { width: 86%; }
+img { vertical-align: bottom; }
+
+
+/* 全局样式结束 */
+
+/* 半透明遮罩层 */
+#hide-bg {
+	background: rgba(0,0,0,0.8);
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 500;
+}
+
+/* 搜索 */
+.search {
+	padding: 0.3em 2.5em 0.3em 0.5em;
+	background-color: #f6f6f6;
+	border-bottom: 1px solid #ccc;
+	position: relative;
+	box-shadow: 3px 0px 2px #ccc;
+	z-index: 99;
+}
+.search input {
+	width: 100%;
+	height: 2em;
+	line-height: 2em;
+	border: none;
+	background-color: #e3e3e5;
+	border-radius: 5px;
+	text-indent: 0.5em;
+}
+.search > .step {
+	display: block;
+	position: absolute;
+	right: 0.5em;
+	top: 0.2em;
+	height: 2em;
+	font-size: 1.5em;
+}
+.search > .step i {
+	color: #666;
+}
+/* 控制板、分类导航 */
+.panel, .catalog {
+	width: 100%;
+	font-size: 0.9em;
+	height: 2em;
+	line-height: 2em;
+	padding: 0.2em 0;
+	background: #fff;
+	border-bottom: 1px solid #ccc;
+}
+.panel a, .catalog a {
+	display: block;
+	float: left;
+	box-sizing: border-box;
+	width: 33.3%;
+	color: #666;
+	text-align: center;
+	border-right: 1px solid #ccc;
+}
